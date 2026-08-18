@@ -1,0 +1,48 @@
+﻿[Wait]
+Path=Windows 7 (Vista) Busy.ani
+
+[Crosshair]
+Path=Windows 7 (Vista) Precision Select.cur
+
+[IBeam]
+Path=Windows 7 (Vista) Text Select.cur
+
+[NWPen]
+Path=Windows 7 (Vista) Handwriting.cur
+
+[No]
+Path=Windows 7 (Vista) Unavailable.cur
+
+[SizeNS]
+Path=Windows 7 (Vista) Vertical Resize.cur
+
+[SizeWE]
+Path=Windows 7 (Vista) Horizontal.cur
+
+[SizeNWSE]
+Path=Windows 7 (Vista) Diagonal Resize 1.cur
+
+[SizeNESW]
+Path=Windows 7 (Vista) Diagonal Resize 2.cur
+
+[SizeAll]
+Path=Windows 7 (Vista) Move.cur
+
+[UpArrow]
+Path=Windows 7 (Vista) Alternate Select.cur
+
+[Hand]
+Path=Windows 7 (Vista) Link Select.cur
+
+[Pin]
+Path=Windows 7 (Vista) Location Select.cur
+
+[Person]
+Path=Windows 7 (Vista) Person Select.cur
+
+[Arrow]
+Path=Windows 7 (Vista) Normal Select.cur
+
+[AppStarting]
+Path=Windows 7 (Vista) Working In Background.ani
+
