@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" preserveAspectRatio="xMidYMid slice">
+  <!-- CORGOS 10's desktop: a dark blue field with a lit four-pane window
+       floating in it, drawn rather than photographed. Original artwork —
+       the win10-replica repo this theme was asked to draw on ships no
+       licence at all, so nothing of its is used here. -->
+  <defs>
+    <radialGradient id="field" cx="52%" cy="46%" r="78%">
+      <stop offset="0%" stop-color="#12406f"/>
+      <stop offset="55%" stop-color="#0a2547"/>
+      <stop offset="100%" stop-color="#04101f"/>
+    </radialGradient>
+    <linearGradient id="pane" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7fd2ff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#1f7fd0" stop-opacity="0.75"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0.6">
+      <stop offset="0%" stop-color="#8fd8ff" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#8fd8ff" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="26"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#field)"/>
+
+  <!-- light thrown out past the panes -->
+  <g filter="url(#soft)" opacity="0.75">
+    <polygon points="640,250 1580,60 1600,900 520,760" fill="url(#beam)"/>
+  </g>
+
+  <!-- the window itself, tilted, panes slightly apart -->
+  <g transform="translate(800 450) rotate(-9) skewY(6) translate(-800 -450)">
+    <rect x="600" y="250" width="180" height="180" rx="4" fill="url(#pane)"/>
+    <rect x="800" y="232" width="196" height="196" rx="4" fill="url(#pane)"/>
+    <rect x="600" y="452" width="180" height="172" rx="4" fill="url(#pane)"/>
+    <rect x="800" y="450" width="196" height="188" rx="4" fill="url(#pane)"/>
+  </g>
+
+  <!-- a haze over the lot so it sits in the field rather than on it -->
+  <rect width="1600" height="900" fill="#04101f" opacity="0.18"/>
+</svg>

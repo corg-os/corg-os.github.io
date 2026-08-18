@@ -1,0 +1,56 @@
+# Netlify deploy config.
+#
+# The game is plain static files, so there is no build step — Netlify just
+# publishes the repo root. The one piece of the local `node server.js` build
+# that Netlify can't do on its own is the Corg Explorer proxy, which is why
+# netlify/functions/gugexplorer-proxy.mjs exists.
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# The function declares these paths itself (`export const config`), so it
+# already answers on /gugexplorer-proxy; these are the fallback for the case
+# where that declaration isn't honoured. They are deliberately NOT `force`d —
+# a forced rewrite would win over the function's own route and, if the function
+# didn't deploy, turn every proxied page into Netlify's 404.
+#
+# NOTE: functions only exist on a deploy that ran Netlify's bundler. A
+# drag-and-drop deploy of this folder publishes netlify/functions as plain
+# static files (you can fetch the .mjs source) and no function is created, so
+# the in-game browser 404s. Deploy with `npx netlify deploy --prod` or a
+# connected Git repo. Cloudflare Pages ignores this file entirely — that host's
+# copy of the proxy is _worker.js.
+[[redirects]]
+  from = "/gugexplorer-proxy"
+  to = "/.netlify/functions/gugexplorer-proxy"
+  status = 200
+
+[[redirects]]
+  from = "/gugexplorer-proxy/*"
+  to = "/.netlify/functions/gugexplorer-proxy/:splat"
+  status = 200
+
+# Cross-origin isolation, matching buildHeaders() in server.js. Half-Life
+# (WebXash) needs SharedArrayBuffer + WASM threads, which only exist on a
+# cross-origin-isolated page. 'credentialless' rather than 'require-corp' so
+# the proxied Corg Explorer iframe and its third-party subresources aren't
+# blocked for want of a CORP header.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Embedder-Policy = "credentialless"
+    Cross-Origin-Resource-Policy = "cross-origin"
+
+# Netlify has no MIME type for the cursor files, and a cursor served as
+# application/octet-stream is ignored by the browser.
+[[headers]]
+  for = "/*.cur"
+  [headers.values]
+    Content-Type = "image/x-icon"
+
+[[headers]]
+  for = "/*.ani"
+  [headers.values]
+    Content-Type = "application/x-navi-animation"

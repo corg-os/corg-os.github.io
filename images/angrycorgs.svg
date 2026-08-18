@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" shape-rendering="crispEdges">
+  <!-- Sky -->
+  <rect x="1" y="4" width="30" height="24" rx="2" fill="#7fc4e8" stroke="#0a1230" stroke-width="1"/>
+  <!-- Ground -->
+  <rect x="2" y="24" width="28" height="3" fill="#7ec850"/>
+  <!-- Slingshot -->
+  <rect x="7" y="14" width="2" height="10" fill="#6b4423"/>
+  <path d="M6 14 L5 10 M10 14 L11 10" stroke="#6b4423" stroke-width="2" fill="none"/>
+  <!-- Band -->
+  <path d="M5 10 L9 15 L11 10" stroke="#3a1d05" stroke-width="1" fill="none"/>
+  <!-- Corg on the band -->
+  <circle cx="9" cy="14" r="3.5" fill="#e08a2e" stroke="#7a3f0a" stroke-width="1"/>
+  <rect x="7" y="12" width="1" height="1" fill="#3a1d05"/>
+  <rect x="10" y="12" width="1" height="1" fill="#3a1d05"/>
+  <rect x="8" y="15" width="2" height="1" fill="#fff"/>
+  <!-- Tower of ad blocks, one already toppling -->
+  <rect x="20" y="17" width="8" height="7" fill="#c0c0c0" stroke="#404040" stroke-width="1"/>
+  <rect x="21" y="18" width="6" height="2" fill="#000080"/>
+  <rect x="21" y="10" width="7" height="6" fill="#c0c0c0" stroke="#404040" stroke-width="1"/>
+  <rect x="22" y="11" width="5" height="2" fill="#000080"/>
+  <!-- Arc of the shot -->
+  <path d="M13 12 Q17 6 21 9" stroke="#fff" stroke-width="0.8" stroke-dasharray="1.5 1.5" fill="none" opacity="0.8"/>
+</svg>

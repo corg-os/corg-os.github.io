@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+    <!-- Corgpilot: the Copilot ribbon, wearing a pair of corgi ears. The two
+         loops and the Fluent gradient are the shape everyone recognises as
+         "the AI button"; the ears are the only joke, and they're the point. -->
+    <defs>
+        <linearGradient id="corgpilotGrad" x1="4" y1="26" x2="28" y2="6" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#8C52FF"/>
+            <stop offset="0.5" stop-color="#2F7DE1"/>
+            <stop offset="1" stop-color="#2ED3C6"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Ears -->
+    <path d="M8 9 L6.5 3 L11.5 6 Z" fill="#D98A3C"/>
+    <path d="M24 9 L25.5 3 L20.5 6 Z" fill="#D98A3C"/>
+
+    <!-- The ribbon: two crossing sweeps, drawn as strokes so it reads at 16px. -->
+    <path d="M7 22c-1.6-3.6 0.4-8.4 4.6-9.9 4.2-1.5 7.7 0.9 9.4 4.4"
+          stroke="url(#corgpilotGrad)" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+    <path d="M25 12c1.6 3.6-0.4 8.4-4.6 9.9-4.2 1.5-7.7-0.9-9.4-4.4"
+          stroke="url(#corgpilotGrad)" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+</svg>
