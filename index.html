@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORG_Clicker.exe</title>
+    <link rel="icon" type="image/x-icon" href="images/corgicon.png">
+    <link rel="stylesheet" href="style.css">
+    <!-- GitHub Pages (and any other static host that can't set custom response
+         headers) can't send the Cross-Origin-Opener-Policy / Cross-Origin-
+         Embedder-Policy headers Half-Life (WebXash) needs for SharedArrayBuffer.
+         This service worker injects them on every same-origin response instead,
+         which is also what covers the halflife/ iframe once it's active. Hosts
+         that already set the real headers (Netlify, Cloudflare Pages, the local
+         node server.js) are unaffected — the worker just re-adds headers that
+         are already there. See coi-serviceworker.js and halflife/coi-serviceworker.js.
+    -->
+    <script src="coi-serviceworker.js"></script>
+</head>
+<body>
+    <div id="desktop-icons">
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleGugClickerWindow();">
+            <img src="images/corgicon.png">
+            <span>CORG_Clicker</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleGugExplorer();">
+            <img class="explorer-icon" src="images/explorer95.svg">
+            <span>Corg Explorer</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleHalfLife();">
+            <img src="images/halflife.png">
+            <span>Half-Life</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleSettings();">
+            <img class="settings-icon" src="images/controlpanel95.svg">
+            <span class="settings-label">Control Panel</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleAchievements();">
+            <img src="images/achievements.png">
+            <span>Achievements</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleMinesweeper();">
+            <img src="images/winxp/minesweeper.png">
+            <span>Minesweeper</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); togglePaint();">
+            <img src="images/winxp/paint.png">
+            <span>Paint</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleNotepad();">
+            <img src="images/winxp/notepad.png">
+            <span>Notepad</span>
+        </div>
+        <div class="desktop-icon win11-only" onclick="playSound('upgrade-audio'); toggleCorgpilot();" title="Your AI companion. It knows one word.">
+            <img src="images/corgpilot.png">
+            <span>Corgpilot</span>
+        </div>
+        <div class="desktop-icon retro-only" onclick="playSound('upgrade-audio'); togglePong();">
+            <img src="images/pong.svg">
+            <span>Pong</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleAdSmasher();">
+            <img src="images/adsmasher.svg">
+            <span>Ad Smasher</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleFlappyCorg();">
+            <img src="images/flappycorg.svg">
+            <span>Flappy Corg</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleAngryCorgs();">
+            <img src="images/angrycorgs.svg">
+            <span>Angry Corgs</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); toggleHopecon();" title="The current hopecon is 3.">
+            <img src="images/hopecon.svg">
+            <span>Hopecon Tracker</span>
+        </div>
+        <div class="desktop-icon" onclick="playSound('upgrade-audio'); spawnExtraCorg();" title="Adds another Corg to the desktop">
+            <img src="images/corg.png">
+            <span data-no-corg>corg.exe</span>
+        </div>
+        <div class="desktop-icon trash-target" id="desktop-trashcan" title="Gugslop (Drag ads here to delete!)">
+            <img class="trash-icon" src="images/trashcan.png" alt="Gugslop">
+            <span>Gugslop</span>
+        </div>
+    </div>
+
+    <div id="main-content-wrapper">
+        <div class="win98-window game-area dockable-window" id="gugclicker-window" style="display: none;">
+            <div class="win98-titlebar">
+                <span>C:\WINDOWS\CORG_Clicker.exe</span>
+                <button class="win win98-button close-btn" onclick="playSound('upgrade-audio'); toggleGugClickerWindow()">X</button>
+            </div>
+            
+            <div class="win98-content" id="game-content-inner">
+                <div class="score-container">
+                    <strong>CORGs Hoarded:</strong> <span id="score">0</span>
+                </div>
+                <div class="stats-text">
+                    Per Click: <span id="gug-per-click">1</span> | 
+                    Per Second: <span id="gug-per-second">0</span> |
+                    Per Trash: <span id="gug-per-recycle">0</span><br><br>
+                </div>
+                
+                <button class="win98-button" id="open-shop-btn" onclick="toggleShop()">
+                    Run Black_Market_Shop.dll
+                </button>
+
+                <div>
+                    <img id="gug-can" src="images/gug.png" alt="CORG" onclick="clickGug()">
+                </div>
+            </div>
+
+            <div id="trashcan" class="trash-target" title="Gugslop (Drag ads here to delete!)">
+                <img class="trash-icon" src="images/trashcan.png" alt="Gugslop">
+                <div class="trashcan-label">Gugslop</div>
+            </div>
+        </div>
+
+        <div id="shop-overlay-wrapper" style="display: none;">
+            <div class="win98-window shop-area dockable-window">
+                <div class="win98-titlebar flex-between">
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <img src="images/blackmarket.svg" style="width: 14px; height: 14px;">
+                        <span>Black_Market_Shop.dll</span>
+                    </div>
+                    <button class="win win98-button close-btn shop-close-btn" onclick="playSound('upgrade-audio'); closeShop()">X</button>
+                </div>
+                
+                <div class="win98-tabs">
+                    <button class="win98-tab active" id="tab-btn-main" onclick="switchTab('main')">Upgrades</button>
+                    <button class="win98-tab" id="tab-btn-recycle" onclick="switchTab('recycle')">Gugslop</button>
+                    <button class="win98-tab" id="tab-btn-gambling" onclick="showGamblingWarning()">Gambling</button>
+                </div>
+
+                <div class="win98-content tab-content active" id="shop-container-main"></div>
+                <div class="win98-content tab-content" id="shop-container-recycle" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="gambling-warning-window" class="screen-overlay modal-dim" style="display:none;">
+        <div class="win98-window movable-resizable" style="max-width: 420px; min-width: 320px;">
+            <div class="win98-titlebar flex-between">
+                <span>Warning</span>
+                <button class="win win98-button close-btn" onclick="closeGamblingWarningWindow()">X</button>
+            </div>
+            <div class="win98-content">
+                <p style="margin: 0; line-height: 1.4; font-size: 14px;">gambling is bad for you, however guggers want you to gamble in gugclicker</p>
+                <div style="margin-top: 16px; text-align: right;">
+                    <button class="win98-button" onclick="closeGamblingWarningWindow()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="guggy-container" class="guggy-container" onclick="clickDesktopCorg()">
+        <div id="guggy-bubble" class="guggy-bubble" style="display: none;">
+            <div id="guggy-text"></div>
+            <div id="guggy-buttons" class="guggy-buttons" style="display: none;">
+                <button class="guggy-btn" onclick="handleGuggyResponse('yes')">Yes</button>
+                <button class="guggy-btn" onclick="handleGuggyResponse('no')">No</button>
+            </div>
+            <div class="guggy-bubble-tail"></div>
+        </div>
+
+        <div class="guggy-icon-group" onclick="triggerGuggy()">
+            <img id="guggy-img" class="corg-img" src="images/corg.png" alt="Corg">
+        </div>
+    </div>
+
+    <div id="win11-start-menu" class="win11-start-menu" style="display: none;">
+        <div class="win11-search-bar">
+            <img src="images/win11/search.png" style="width: 16px; height: 16px;">
+            <input type="text" placeholder="Type here to search CORG apps, settings, and documents..." disabled>
+        </div>
+        <div class="win11-start-section">
+            <div class="win11-section-header">
+                <span>Pinned Apps</span>
+                <button class="win11-small-btn">All apps ></button>
+            </div>
+            <div class="win11-pinned-grid">
+                <div class="win11-app-item" onclick="playSound('upgrade-audio'); toggleStartMenu();">
+                    <img src="images/corgicon.png">
+                    <span>CORG_Clicker</span>
+                </div>
+                <div class="win11-app-item" onclick="playSound('upgrade-audio'); toggleCorgpilot(); toggleStartMenu();">
+                    <img src="images/corgpilot.png">
+                    <span>Corgpilot</span>
+                </div>
+                <div class="win11-app-item" onclick="playSound('upgrade-audio'); toggleHalfLife(); toggleStartMenu();">
+                    <img src="images/halflife.png">
+                    <span>Half-Life</span>
+                </div>
+                <div class="win11-app-item" onclick="playSound('upgrade-audio'); toggleGugExplorer(); toggleStartMenu();">
+                    <img class="explorer-icon" src="images/win11/win11browser.png">
+                    <span>Corg Explorer</span>
+                </div>
+                <div class="win11-app-item" onclick="playSound('upgrade-audio'); toggleSettings(); toggleStartMenu();">
+                    <img src="images/win11/settings.png">
+                    <span>Settings</span>
+                </div>
+                <div class="win11-app-item" onclick="playSound('upgrade-audio'); toggleAchievements(); toggleStartMenu();">
+                    <img src="images/achievements.png">
+                    <span>Achievements</span>
+                </div>
+                <div class="win11-app-item" onclick="playSound('upgrade-audio'); toggleAdSmasher(); toggleStartMenu();">
+                    <img src="images/adsmasher.svg">
+                    <span>Ad Smasher</span>
+                </div>
+                <div class="win11-app-item" onclick="playSound('upgrade-audio'); toggleFlappyCorg(); toggleStartMenu();">
+                    <img src="images/flappycorg.svg">
+                    <span>Flappy Corg</span>
+                </div>
+                <div class="win11-app-item" onclick="playSound('upgrade-audio'); toggleAngryCorgs(); toggleStartMenu();">
+                    <img src="images/angrycorgs.svg">
+                    <span>Angry Corgs</span>
+                </div>
+                <div class="win11-app-item" onclick="playSound('upgrade-audio'); toggleHopecon(); toggleStartMenu();">
+                    <img src="images/hopecon.svg">
+                    <span>Hopecon</span>
+                </div>
+            </div>
+        </div>
+        <div class="win11-start-footer">
+            <div class="win11-user-profile">
+                <img src="images/corg.png" style="width: 32px; height: 32px; border-radius: 50%;">
+                <span>Corg User</span>
+            </div>
+            <button class="win11-power-btn" onclick="shutDown()" title="Shut down">
+                <img src="images/osicons/power-win11.svg" style="width: 16px; height: 16px;">
+            </button>
+        </div>
+    </div>
+
+    <div id="win95-start-menu" class="win95-start-menu" style="display: none;">
+        <div class="win95-start-banner"><span id="start-banner-text">Windows 95</span></div>
+        <div class="win95-start-programs">
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleGugClickerWindow(); toggleStartMenu();">
+                <img src="images/corgicon.png">
+                <span>CORG_Clicker</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleGugExplorer(); toggleStartMenu();">
+                <img class="explorer-icon" src="images/explorer95.svg">
+                <span>Corg Explorer</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleHalfLife(); toggleStartMenu();">
+                <img src="images/halflife.png">
+                <span>Half-Life</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleSettings(); toggleStartMenu();">
+                <img class="settings-icon" src="images/controlpanel95.svg">
+                <span class="settings-label">Control Panel</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleAchievements(); toggleStartMenu();">
+                <img src="images/achievements.png">
+                <span>Achievements</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleMinesweeper(); toggleStartMenu();">
+                <img src="images/winxp/minesweeper.png">
+                <span>Minesweeper</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); togglePaint(); toggleStartMenu();">
+                <img src="images/winxp/paint.png">
+                <span>Paint</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleNotepad(); toggleStartMenu();">
+                <img src="images/winxp/notepad.png">
+                <span>Notepad</span>
+            </div>
+            <div class="win95-program-item retro-only" onclick="playSound('upgrade-audio'); togglePong(); toggleStartMenu();">
+                <img src="images/pong.svg">
+                <span>Pong</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleAdSmasher(); toggleStartMenu();">
+                <img src="images/adsmasher.svg">
+                <span>Ad Smasher</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleFlappyCorg(); toggleStartMenu();">
+                <img src="images/flappycorg.svg">
+                <span>Flappy Corg</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleAngryCorgs(); toggleStartMenu();">
+                <img src="images/angrycorgs.svg">
+                <span>Angry Corgs</span>
+            </div>
+            <div class="win95-program-item" onclick="playSound('upgrade-audio'); toggleHopecon(); toggleStartMenu();">
+                <img src="images/hopecon.svg">
+                <span>Hopecon Tracker</span>
+            </div>
+            <div class="win95-start-divider"></div>
+            <div class="win95-program-item win95-shutdown-item" onclick="playSound('upgrade-audio'); shutDown();">
+                <img id="start-shutdown-icon" src="images/osicons/shutdown-win95.svg">
+                <span>Shut Down...</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="win95-taskbar">
+        <button class="win98-button" id="start-button" onclick="playSound('upgrade-audio'); toggleStartMenu();">
+            <img src="images/win95icon.png" style="width: 16px; height: 16px;">
+            <span>Start</span>
+        </button>
+        <div class="taskbar-divider"></div>
+        
+        <button class="win98-button task-btn" onclick="playSound('upgrade-audio'); toggleGugClickerWindow()">
+            <img src="images/corgicon.png" style="width:12px;height:12px;"> CORG_Clicker
+        </button>
+
+        <button class="win98-button task-btn explorer-btn" onclick="playSound('upgrade-audio'); toggleGugExplorer()">
+            <img class="explorer-icon" src="images/explorer95.svg" style="width:12px;height:12px;"> Corg Explorer
+        </button>
+
+        <button class="win98-button task-btn halflife-btn" onclick="playSound('upgrade-audio'); toggleHalfLife()">
+            <img src="images/halflife.png" style="width:14px;height:14px;"> Half-Life
+        </button>
+
+        <button class="win98-button task-btn settings-btn" onclick="playSound('upgrade-audio'); toggleSettings()">
+            <img class="settings-icon" src="images/controlpanel95.svg" style="width:12px;height:12px;"> <span class="settings-label">Control Panel</span>
+        </button>
+
+        <button class="win98-button task-btn win11-only corgpilot-btn" onclick="playSound('upgrade-audio'); toggleCorgpilot()">
+            <img class="corgpilot-btn-icon" src="images/corgpilot.png"> Corgpilot
+        </button>
+
+        <button class="win98-button task-btn achievements-btn" onclick="playSound('upgrade-audio'); toggleAchievements()" style="width: 105px; margin-left: 4px;">
+            <img src="images/achievements.png" style="width:12px;height:12px;"> Achievements
+        </button>
+
+
+        <div id="system-tray">
+            <div id="tray-clock">12:00 AM</div>
+        </div>
+    </div>
+
+    <audio id="error-audio" src="sfx/win95error.mp3"></audio>
+    <audio id="upgrade-audio" src="sfx/clickbutton.mp3"></audio>
+    <audio id="window-open-audio" src="sfx/windowopen.mp3"></audio>
+    <audio id="notify-audio" src="sfx/windowopen.mp3"></audio>
+    <audio id="gman-audio" src="sfx/gmanendsound.ogg"></audio>
+    <audio id="corg-audio" src="sfx/corg.wav"></audio>
+    <audio id="recycle-audio" src="sfx/recycle.mp3"></audio>
+    <audio id="achievement-audio" src="sfx/achievement.wav"></audio>
+
+
+    <div id="gameapp-screen" class="screen-overlay flex-center" style="display: none; z-index: 9995;">
+        <div class="win98-window gameapp-window movable-resizable"
+             style="width: 900px; height: 620px; max-width: 96vw; max-height: 92vh;">
+            <div class="win98-titlebar flex-between">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img id="gameapp-icon" src="images/halflife.png" style="width:16px;height:16px;">
+                    <span id="gameapp-title">Half-Life</span>
+                </div>
+                <button class="win win98-button close-btn" onclick="playSound('upgrade-audio'); closeGameApp()">X</button>
+            </div>
+            <iframe id="gameapp-iframe"
+                    src=""
+                    allow="cross-origin-isolated; clipboard-read; clipboard-write; fullscreen; gamepad"
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals allow-downloads allow-pointer-lock"
+                    allowfullscreen>
+            </iframe>
+        </div>
+    </div>
+
+    <div id="gugexplorer-screen" class="screen-overlay flex-center" style="display: none; z-index: 9994;">
+        <div class="win98-window gugexplorer-window movable-resizable" style="width: 900px; max-width: 96vw; height: 640px; max-height: 92vh; display: flex; flex-direction: column;">
+            <div class="win98-titlebar flex-between">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img class="explorer-icon" src="images/explorer95.svg" style="width: 16px; height: 16px;">
+                    <span>Corg Explorer</span>
+                </div>
+                <button class="win98-button close-btn" onclick="playSound('upgrade-audio'); toggleGugExplorer()">X</button>
+            </div>
+            <div class="gugexplorer-toolbar">
+                <button class="win98-button" onclick="gugExplorerHome()">Home</button>
+                <input type="text" id="gugexplorer-url" class="win98-input gugexplorer-url-input" value="https://www.google.com" onkeydown="if(event.key==='Enter') gugExplorerNavigate()">
+                <button class="win98-button" onclick="gugExplorerNavigate()">Go</button>
+            </div>
+            <div style="flex: 1; overflow: hidden; background: #fff;">
+                <iframe id="gugexplorer-iframe"
+                        src=""
+                        style="width: 100%; height: 100%; border: none; display: block;"
+                        sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-modals allow-downloads">
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-screen" class="screen-overlay">
+        <div class="win98-window welcome-window movable-resizable">
+            <div class="win98-titlebar">
+                <span><span class="settings-label">Control Panel</span> - Settings.exe</span>
+                <button class="win win98-button close-btn" onclick="playSound('upgrade-audio'); toggleSettings()">X</button>
+            </div>
+            <div class="win98-content welcome-content text-left">
+                <h2 class="text-center text-blue">System Settings</h2>
+                <div class="divider"></div>
+                <label for="sfx-volume"><strong>Sound Effects Volume:</strong><p>(this wont get rid of the overly loud youtube videos, u cannot escape it muhahaha)</p></label><br>
+                <input type="range" id="sfx-volume" min="0" max="1" step="0.01" value="1" onchange="updateSFXVolume(this.value)" oninput="updateSFXVolume(this.value)">
+                <div class="divider"></div>
+                <label for="music-volume"><strong>Music Volume:</strong>
+                    <p>the Ad Smasher radio, which is the only music left in here</p></label><br>
+                <input type="range" id="music-volume" min="0" max="1" step="0.01" value="0.5" onchange="updateMusicVolume(this.value)" oninput="updateMusicVolume(this.value)">
+                <div class="divider"></div>
+                <label for="glass-volume"><strong>Glass Breaking Volume:</strong>
+                    <p>every ad you throw Corg through, and the intro. Turn it down if that's a lot.</p></label><br>
+                <input type="range" id="glass-volume" min="0" max="1" step="0.01" value="1" onchange="updateGlassVolume(this.value)" oninput="updateGlassVolume(this.value)">
+                <div class="divider"></div>
+                <label for="screensaver-delay"><strong>Corg Screensaver:</strong>
+                    <p>Idle this long and Corg takes over the screen. Drag to 0 to switch it off.</p></label><br>
+                <input type="range" id="screensaver-delay" min="0" max="600" step="5" value="45"
+                       oninput="setScreensaverDelay(this.value)">
+                <span id="screensaver-delay-label">45s</span>
+                <div class="divider"></div>
+                <label><strong>Developer Console:</strong></label>
+                <div class="dev-console-wrapper">
+                    <div class="corg-console-body corg-console-log dev-console-log" id="dev-console-log">] Type 'dev 1' to enable developer mode, then 'set_gug &lt;amount&gt;'.</div>
+                    <div class="corg-console-inputrow dev-console-inputrow">
+                        <input type="text" id="dev-console-input" class="corg-console-input" autocomplete="off" placeholder="dev 1 / set_gug 99999" onkeydown="if(event.key==='Enter') devConsoleSubmit()">
+                        <button class="corg-console-submit" onclick="devConsoleSubmit()">Submit</button>
+                    </div>
+                </div>
+                <p class="text-center small-text mt-15">System Reset Tool:</p>
+                <button class="win98-button full-width text-bold btn-danger" onclick="resetGame()">Format C:\ (Reset All Data)</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="welcome-screen" class="screen-overlay modal-dim">
+        <div class="win98-window welcome-window movable-resizable">
+            <div class="win98-titlebar">
+                <span>Welcome to CORG_Clicker.exe - Setup</span>
+                <button class="win win98-button close-btn" onclick="playSound('upgrade-audio'); closeWelcome()">X</button>
+            </div>
+            <div class="win98-content welcome-content">
+                <img src="images/corgicon.png" alt="Setup" class="setup-icon">
+                <h1 class="text-blue">CORG Clicker Setup</h1>
+                <h2><img class="corg-word" src="images/corg.png" alt="corg">? <img class="corg-word" src="images/corg.png" alt="corg">.</h2>
+                <div class="divider"></div>
+                <p>WARNING: The free version of this software holds ads, because fuck you.</p>
+                <p>Installation of CORG_Clicker.exe requires the following steps:</p>
+                <p class="text-bold text-danger">1. Immediate hoarding of funny CORGs.</p>
+                <p>Failure to comply will result in... unforseen consequences.</p>
+                <p>Click Begin to start hoarding.</p>
+                <div class="divider"></div>
+                <div class="text-right">
+                    <button class="win98-button begin-btn" onclick="closeWelcome()">Begin ></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="true-victory-screen" class="screen-overlay modal-dim">
+        <div class="win98-window game-over-window movable-resizable">
+            <div class="win98-titlebar">
+                <span>System Message - YOU_BOUGHT_VALVE.exe</span>
+                <button class="win win98-button close-btn" onclick="resumeTrueVictory()">X</button>
+            </div>
+            <div class="win98-content game-over-content">
+                <h2>The Absolute End.</h2>
+                <p>You have hoarded enough CORG to buy Valve Software outright. The CORG is yours. Steam is yours. The universe is yours.</p>
+                <div class="stats-block">
+                    <strong>God-Tier Statistics:</strong><br><br>
+                    CORGs hoarded: <span id="true-final-score">0</span><br>
+                    Status: You are the CORG.
+                </div>
+                <button class="win win98-button pad-btn text-bold" onclick="resumeTrueVictory()">Rule the Universe</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-over-screen" class="screen-overlay modal-dim">
+        <div class="win98-window game-over-window movable-resizable">
+            <div class="win98-titlebar">
+                <span>System Message - GMANTAKESURCORGS_LOL.exe</span>
+                <button class="win win98-button close-btn" onclick="resumeGame()">X</button>
+            </div>
+            <div class="win98-content game-over-content">
+                <h2>Congratulations!</h2>
+                <p>You have gained enough CORG for a lifetime, however, G-Man requires your CORG... Why? We're really not at liberty to say...</p>
+                <div class="stats-block">
+                    <strong>Final Statistics:</strong><br><br>
+                    Total CORGs remaining: <span id="final-score">0</span><br>
+                    CORG per Click: <span id="final-click">0</span><br>
+                    CORG per Second: <span id="final-gps">0</span>
+                </div>
+                <p>Now get the post-game upgrades, with a secret TRUE ending....</p>
+                <button class="win win98-button pad-btn text-bold" onclick="resumeGame()">Keep Playing</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="achievements-screen" class="screen-overlay">
+        <div class="win98-window movable-resizable" style="width: 450px; max-width: 95%; max-height: 80vh;">
+            <div class="win98-titlebar flex-between">
+                <span>Achievements.exe</span>
+                <button class="win98-button close-btn" onclick="playSound('upgrade-audio'); toggleAchievements()">X</button>
+            </div>
+            <div class="win98-content achievements-body">
+                <h2 class="achievements-heading">Unlocked Achievements</h2>
+                <div class="divider"></div>
+                <div id="achievements-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="minesweeper-screen" class="screen-overlay flex-center" style="display: none; z-index: 9993;">
+        <div class="win98-window movable-resizable no-resize" style="width: auto;">
+            <div class="win98-titlebar flex-between">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="images/winxp/minesweeper.png" style="width:16px;height:16px;">
+                    <span>Minesweeper</span>
+                </div>
+                <button class="win98-button close-btn" onclick="playSound('upgrade-audio'); toggleMinesweeper()">X</button>
+            </div>
+            <div class="win98-content mine-shell">
+                <div class="mine-board">
+                    <div class="mine-hud">
+                        <div class="mine-counter" id="mine-flags"></div>
+                        <button class="mine-face" id="mine-face" onclick="minesweeperNew()"></button>
+                        <div class="mine-counter" id="mine-timer"></div>
+                    </div>
+                    <div class="mine-grid" id="mine-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="paint-screen" class="screen-overlay flex-center" style="display: none; z-index: 9992;">
+        <div class="win98-window movable-resizable" style="width: 720px; max-width: 96vw;">
+            <div class="win98-titlebar flex-between">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="images/winxp/paint16.png" style="width:16px;height:16px;">
+                    <span>untitled - Paint</span>
+                </div>
+                <button class="win98-button close-btn" onclick="playSound('upgrade-audio'); togglePaint()">X</button>
+            </div>
+            <div class="win98-content paint-shell">
+                <div class="paint-toolbar">
+                    <button class="win98-button paint-tool active" data-tool="pencil" onclick="paintSetTool('pencil', this)">Pencil</button>
+                    <button class="win98-button paint-tool" data-tool="brush" onclick="paintSetTool('brush', this)">Brush</button>
+                    <button class="win98-button paint-tool" data-tool="eraser" onclick="paintSetTool('eraser', this)">Eraser</button>
+                    <span class="paint-sep"></span>
+                    <label>Size <input type="range" id="paint-size" min="1" max="30" value="4"></label>
+                    <span class="paint-sep"></span>
+                    <button class="win98-button" onclick="paintClear()">Clear</button>
+                </div>
+                <div class="paint-palette" id="paint-palette"></div>
+                <div class="paint-canvas-wrap">
+                    <canvas id="paint-canvas" width="680" height="380"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="notepad-screen" class="screen-overlay flex-center" style="display: none; z-index: 9991;">
+        <div class="win98-window movable-resizable" style="width: 560px; max-width: 96vw; height: 420px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="win98-titlebar flex-between">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="images/winxp/notepad16.png" style="width:16px;height:16px;">
+                    <span>Untitled - Notepad</span>
+                </div>
+                <button class="win98-button close-btn" onclick="playSound('upgrade-audio'); toggleNotepad()">X</button>
+            </div>
+            <div class="notepad-menubar">
+                <span>File</span><span>Edit</span><span>Format</span><span>View</span><span>Help</span>
+            </div>
+            <textarea id="notepad-text" class="notepad-text" spellcheck="false"></textarea>
+        </div>
+    </div>
+
+    <div id="corgpilot-screen" class="screen-overlay flex-center" style="display: none; z-index: 9989;">
+        <!-- data-no-corg: everywhere else on this desktop the word "corg" turns
+             into a picture of him, and here it mustn't — Corgpilot's whole joke
+             is watching the word itself get typed out. -->
+        <div class="win98-window movable-resizable corgpilot-window" data-no-corg
+             style="width: 520px; max-width: 96vw; height: 660px; max-height: 92vh; display: flex; flex-direction: column;">
+            <div class="win98-titlebar flex-between">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="images/corgpilot.png" style="width:16px;height:16px;">
+                    <span>Corgpilot</span>
+                </div>
+                <button class="win98-button close-btn" onclick="playSound('upgrade-audio'); toggleCorgpilot()">X</button>
+            </div>
+
+            <div class="cp-header">
+                <img class="cp-header-avatar" src="images/corgpilot.png" alt="">
+                <div class="cp-header-meta">
+                    <span class="cp-header-title">Corgpilot</span>
+                    <button class="cp-model" type="button" title="Change model"
+                            onclick="cpToggleModelMenu(event)"><span class="cp-live"></span><span
+                            id="corgpilot-model-name">corg-4o</span><span class="cp-model-caret">&#9662;</span></button>
+                </div>
+                <button class="cp-icon-btn" type="button" title="New chat" aria-label="New chat"
+                        onclick="cpNewChat()">&#10133;</button>
+                <div id="corgpilot-model-menu" class="cp-model-menu" style="display: none;"></div>
+            </div>
+
+            <div id="corgpilot-log" class="cp-log"></div>
+            <div id="corgpilot-status" class="cp-status">
+                <span class="cp-spinner"></span><span class="cp-status-text"></span>
+            </div>
+            <div id="corgpilot-suggestions" class="cp-suggestions" style="display: none;"></div>
+
+            <div class="cp-composer">
+                <div class="cp-inputwrap">
+                    <input type="text" id="corgpilot-input" class="cp-input" autocomplete="off"
+                           placeholder="Ask Corgpilot anything" onkeydown="cpKeyDown(event)">
+                    <button class="cp-send" id="corgpilot-send" type="button" title="Send"
+                            aria-label="Send" onclick="cpSend()"></button>
+                </div>
+            </div>
+            <div class="cp-disclaimer" id="corgpilot-disclaimer">Corgpilot does not use AI. It uses corg. Check responses.</div>
+        </div>
+    </div>
+
+    <!-- HOPECON_Tracker.exe — see hopecon.js. images/hopecon.png is the
+         hopecon scale, and the app's whole job is to point at the band we
+         are on, which is 3. -->
+    <div id="hopecon-screen" class="screen-overlay flex-center" style="display: none; z-index: 9988;">
+        <div class="win98-window movable-resizable hopecon-window"
+             style="width: 820px; max-width: 96vw; height: 640px; max-height: 92vh; display: flex; flex-direction: column;">
+            <div class="win98-titlebar flex-between">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <img src="images/hopecon.svg" style="width:16px;height:16px;">
+                    <span>HOPECON_Tracker.exe</span>
+                </div>
+                <button class="win98-button close-btn" onclick="playSound('upgrade-audio'); toggleHopecon()">X</button>
+            </div>
+
+            <div class="hc-body">
+                <div class="hc-chart-col">
+                    <div class="hc-heading">THE SCALE</div>
+                    <div class="hc-chart" id="hopecon-chart"></div>
+                </div>
+
+                <div class="hc-side">
+                    <div class="hc-readout">
+                        <div class="hc-readout-top">
+                            <span class="hc-readout-word">HOPECON</span>
+                            <span class="hc-level" id="hopecon-level">3</span>
+                        </div>
+                        <div class="hc-level-name" id="hopecon-level-name">A GUY HEARD SOMETHING</div>
+                        <div class="hc-level-note" id="hopecon-level-note"></div>
+                    </div>
+
+                    <div class="hc-heading">THE CLIP</div>
+                    <div class="hc-broadcast">
+                        <!-- Two encodes of the same clip, most-playable first:
+                             hopecon3.mp4 as delivered is HEVC, which most browsers
+                             refuse, so hopecon3-h264.mp4 is the one that actually
+                             plays and the original is the fallback. -->
+                        <video id="hopecon-video" class="hc-video" playsinline preload="metadata">
+                            <source src="videos/hopecon3-h264.mp4" type="video/mp4; codecs=avc1.64001f">
+                            <source src="videos/hopecon3.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="hc-buttons">
+                        <button class="win98-button hc-btn" onclick="hopeconReplay()">Replay</button>
+                        <button class="win98-button hc-btn" id="hopecon-mute" onclick="hopeconToggleMute()">Sound off</button>
+                    </div>
+
+                    <div class="hc-heading">CHECKS</div>
+                    <div class="hc-log" id="hopecon-log"></div>
+
+                    <div class="hc-check">
+                        <span class="hc-checked" id="hopecon-checked">Last checked &mdash;</span>
+                        <button class="win98-button hc-btn" id="hopecon-refresh" onclick="hopeconRefresh()">Check again</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hc-footer">
+                Nobody official runs this page. The hopecon is 3.
+            </div>
+        </div>
+    </div>
+
+    <div id="pong-screen" class="screen-overlay flex-center" style="display: none; z-index: 9990;">
+        <div class="win98-window movable-resizable" style="width: auto;">
+            <div class="win98-titlebar flex-between">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="images/pong.svg" style="width:16px;height:16px;">
+                    <span>CORG Pong</span>
+                </div>
+                <button class="win98-button close-btn" onclick="playSound('upgrade-audio'); togglePong()">X</button>
+            </div>
+            <div class="win98-content pong-shell">
+                <div class="pong-board">
+                    <div class="pong-hud">
+                        <div class="pong-stat"><label>YOU</label><span id="pong-player">0</span></div>
+                        <div class="pong-stat"><label>CPU</label><span id="pong-cpu">0</span></div>
+                        <div class="pong-stat"><label>RALLY</label><span id="pong-rally">0</span></div>
+                        <div class="pong-stat"><label>BEST</label><span id="pong-best">0</span></div>
+                    </div>
+                    <canvas id="pong-canvas" class="pong-canvas"></canvas>
+                    <div class="pong-keys">
+                        <b>&uarr;</b> / <b>W</b> up &nbsp;&middot;&nbsp;
+                        <b>&darr;</b> / <b>S</b> down &nbsp;&middot;&nbsp;
+                        <b>Mouse</b> also moves the paddle &nbsp;&middot;&nbsp;
+                        <b>Space</b> serve &nbsp;&middot;&nbsp;
+                        <b>Enter</b> new game
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="flappycorg-screen" class="screen-overlay flex-center" style="display: none; z-index: 9990;">
+        <div class="win98-window movable-resizable" style="width: auto;">
+            <div class="win98-titlebar flex-between">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="images/flappycorg.svg" style="width:16px;height:16px;">
+                    <span>Flappy Corg</span>
+                </div>
+                <button class="win98-button close-btn" onclick="playSound('upgrade-audio'); toggleFlappyCorg()">X</button>
+            </div>
+            <div class="win98-content flap-shell">
+                <div class="flap-board">
+                    <div class="flap-hud">
+                        <div class="flap-stat"><label>CANS</label><span id="fc-score">0</span></div>
+                        <div class="flap-stat"><label>BEST</label><span id="fc-best">0</span></div>
+                        <div class="flap-stat"><label>SPEED</label><span id="fc-speed">165 px/s</span></div>
+                    </div>
+                    <canvas id="flappycorg-canvas" class="flap-canvas"></canvas>
+                    <div class="flap-keys">
+                        <b>Click</b> / <b>Space</b> flap &nbsp;&middot;&nbsp;
+                        <b>Enter</b> new game &nbsp;&middot;&nbsp;
+                        <b>Esc</b> close
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="angrycorgs-screen" class="screen-overlay flex-center" style="display: none; z-index: 9990;">
+        <div class="win98-window movable-resizable" style="width: auto;">
+            <div class="win98-titlebar flex-between">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                    <img src="images/angrycorgs.svg" style="width:16px;height:16px;">
+                    <span>Angry Corgs</span>
+                </div>
+                <button class="win98-button close-btn" onclick="playSound('upgrade-audio'); toggleAngryCorgs()">X</button>
+            </div>
+            <div class="win98-content angry-shell">
+                <div class="angry-board">
+                    <div class="angry-hud">
+                        <div class="angry-stat"><label>LEVEL</label><span id="ac-level">-</span></div>
+                        <div class="angry-stat"><label>SCORE</label><span id="ac-score">0</span></div>
+                        <div class="angry-stat"><label>CORGS</label><span id="ac-corgs">4</span></div>
+                        <div class="angry-stat"><label>POPUPS</label><span id="ac-ads">0</span></div>
+                        <div class="angry-stat"><label>BEST</label><span id="ac-best">0</span></div>
+                    </div>
+                    <canvas id="angrycorgs-canvas" class="angry-canvas"></canvas>
+                    <div class="angry-keys">
+                        <b>Drag back</b> from the sling and let go &nbsp;&middot;&nbsp;
+                        <b>R</b> retry level &nbsp;&middot;&nbsp;
+                        <b>N</b> skip level &nbsp;&middot;&nbsp;
+                        <b>Esc</b> close
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="adsmasher-screen" class="smash-overlay" style="display: none;">
+        <div class="smash-bar">
+            <div class="smash-brand">
+                <img src="images/adsmasher.svg" alt="">
+                <span>AD SMASHER</span>
+            </div>
+            <div class="smash-stat"><label>SCORE</label><span id="as-score">0</span></div>
+            <div class="smash-stat"><label>CHAIN</label><span id="as-combo">x1</span></div>
+            <div class="smash-stat"><label>ADS</label><span id="as-ads">0/14</span></div>
+            <div class="smash-stat"><label>BEST</label><span id="as-best">0</span></div>
+            <div class="smash-stat smash-radio" id="as-radio">
+                <label>RADIO</label><span id="as-radio-track"></span>
+            </div>
+            <div class="smash-badge" id="as-kevbo-badge" title="No holding Corg">KEVBO</div>
+            <button class="smash-close" title="Quit (Esc)"
+                    onclick="playSound('upgrade-audio'); toggleAdSmasher()">&times;</button>
+        </div>
+
+        <div id="as-flash" class="smash-flash"></div>
+
+        <div id="as-card" class="smash-card">
+            <h2 id="as-card-title">CORG AD SMASHER</h2>
+            <p id="as-card-body"></p>
+
+            <label class="smash-toggle">
+                <input type="checkbox" id="as-kevbo" onchange="asSetKevbo(this.checked)">
+                <span>KEVBO MODE</span>
+            </label>
+            <p id="as-kevbo-note" class="smash-toggle-note"></p>
+
+            <button id="as-card-btn" class="smash-play-btn" onclick="asCardAction()">START</button>
+            <div class="smash-card-keys"><b>Space</b> start &middot; <b>K</b> Kevbo &middot; <b>Esc</b> quit</div>
+        </div>
+    </div>
+
+    <div id="login-screen"></div>
+
+    <div id="main-menu-screen">
+        <div class="main-menu-inner">
+            <div class="mm-wordmark" onclick="mainMenuPokeCorg()">
+                <img class="mm-corg" src="images/corg.png" alt="corg">
+                <span class="mm-os">OS</span>
+            </div>
+
+            <div class="main-menu-buttons">
+                <button class="main-menu-btn mm-play" id="main-menu-play"
+                        onmouseenter="menuHoverSfx()" onclick="menuClickSfx(); mainMenuPlay()">PLAY</button>
+                <button class="main-menu-btn"
+                        onmouseenter="menuHoverSfx()" onclick="menuClickSfx(); mainMenuToggleSettings()">SETTINGS</button>
+            </div>
+
+            <div class="main-menu-settings" id="main-menu-settings">
+                <div class="mm-setting">
+                    <label for="mm-music-volume">MUSIC</label>
+                    <input type="range" id="mm-music-volume" min="0" max="1" step="0.01"
+                           oninput="updateMusicVolume(this.value); mainMenuSyncSettings();">
+                    <span class="mm-value" id="mm-music-value">50%</span>
+                </div>
+                <div class="mm-setting">
+                    <label for="mm-sfx-volume">SOUND</label>
+                    <input type="range" id="mm-sfx-volume" min="0" max="1" step="0.01"
+                           oninput="updateSFXVolume(this.value); mainMenuSyncSettings();">
+                    <span class="mm-value" id="mm-sfx-value">100%</span>
+                </div>
+                <div class="mm-setting">
+                    <label for="mm-glass-volume">GLASS</label>
+                    <input type="range" id="mm-glass-volume" min="0" max="1" step="0.01"
+                           oninput="updateGlassVolume(this.value); mainMenuSyncSettings();">
+                    <span class="mm-value" id="mm-glass-value">100%</span>
+                </div>
+                <label class="mm-check">
+                    <input type="checkbox" id="mm-skip-intro" onchange="devSkipSet('intro', this.checked)">
+                    <span>skip intro video</span>
+                </label>
+                <button class="main-menu-btn mm-small"
+                        onmouseenter="menuHoverSfx()" onclick="menuClickSfx(); mainMenuToggleSettings()">BACK</button>
+            </div>
+        </div>
+        <div class="main-menu-audio-hint" id="mm-audio-hint">click anywhere to enable sound</div>
+
+        <div class="main-menu-footer">
+            a CORG production
+            <span class="main-menu-warning">glass breaking sfx warning</span>
+        </div>
+        <div class="main-menu-version">0.2 beta</div>
+    </div>
+
+    <div id="intro-video-screen">
+        <div class="intro-stage" id="intro-stage">
+            <video id="intro-video" class="intro-video" playsinline preload="auto" src="videos/intro.mp4"></video>
+
+            <div id="intro-shards" class="intro-shards"></div>
+
+            <div id="intro-corg" class="intro-corg">
+                <div id="intro-bubble" class="guggy-bubble intro-bubble" style="display: none;">
+                    <div id="intro-bubble-text"></div>
+                    <div class="guggy-bubble-tail"></div>
+                </div>
+                <img src="images/corg.png" alt="corg">
+            </div>
+        </div>
+        <div class="intro-skip">Esc to skip</div>
+    </div>
+
+    <div id="setup-screen">
+        <div class="setup-window">
+            <div class="setup-titlebar">
+                <span class="setup-title"><img src="images/corgicon.png" alt=""> CORG OS Setup</span>
+                <span class="setup-controls">
+                    <span class="setup-ctl">&#8211;</span>
+                    <span class="setup-ctl">&#9633;</span>
+                    <span class="setup-ctl setup-ctl-close">&#10005;</span>
+                </span>
+            </div>
+            <div class="setup-body">
+                <div class="setup-logo">
+                    <img src="images/corgicon.png" alt="">
+                    <span>CORG OS</span>
+                </div>
+
+                <div class="setup-stage">
+                    <img id="setup-guggy" src="images/corg.png" alt="Corg">
+                    <div id="setup-subtitle" class="setup-subtitle"></div>
+                </div>
+
+                <button id="setup-install-btn" class="setup-install" onclick="endSetupSequence()">Install now</button>
+
+                <div class="setup-footer">
+                    <span class="setup-repair">Repair your computer</span>
+                    <span class="setup-copy">&copy; 1997 CORG Corporation. All rights reserved.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="boot-menu-screen">
+        <div class="deck-shell">
+            <div class="deck-topbar">
+                <div class="deck-top-left">
+                    <img class="deck-top-logo" src="images/corgicon.png" alt="">
+                    <span>CORGOS</span>
+                </div>
+                <div class="deck-top-right">
+                    <svg class="deck-top-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 L21 21"/>
+                    </svg>
+                    <svg class="deck-top-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"/><path d="M3 12h18"/>
+                        <path d="M12 3c3 3.2 3 14.8 0 18c-3-3.2-3-14.8 0-18z"/>
+                    </svg>
+                    <span class="deck-clock" id="deck-clock">--:--</span>
+                    <span class="deck-avatar"><img src="images/corg.png" alt=""></span>
+                </div>
+            </div>
+
+            <div class="deck-body">
+                <div class="deck-heading">Install Media</div>
+                <div class="deck-shelf" id="boot-os-list"></div>
+            </div>
+
+            <div class="deck-bottombar">
+                <div class="deck-bottom-left">
+                    <span class="deck-pill">CORGOS</span>
+                    <span class="deck-pill deck-pill-menu">MENU</span>
+                </div>
+                <div class="deck-bottom-right">
+                    <span class="deck-hint deck-hint-mouse">CLICK A DISC TO BOOT IT
+                        &mdash; <b id="boot-arrow-label" class="deck-hint-name">CORGOS 95</b></span>
+                    <span class="deck-hint"><b class="deck-btn deck-btn-a">A</b> BOOT</span>
+                    <span class="deck-hint"><b class="deck-btn deck-btn-b">B</b> BACK</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <script src="data.js"></script>
+    <script src="audio.js"></script>
+    <script src="main.js"></script>
+    <script src="pong.js"></script>
+    <script src="adsmasher.js"></script>
+    <script src="win9xcanvas.js"></script>
+    <script src="flappycorg.js"></script>
+    <script src="angrycorgs.js"></script>
+    <script src="corgpilot.js"></script>
+    <script src="hopecon.js"></script>
+</body>
+</html>
