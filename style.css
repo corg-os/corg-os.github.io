@@ -1,0 +1,4593 @@
+@font-face {
+    font-family: 'VCR OSD Mono';
+    src: url('fonts/VCR_OSD_MONO_1.001.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+/* The title screen's face. `block` rather than `swap`: the title screen is four
+   words of large type, and having them land in a fallback and then jump is more
+   noticeable there than a beat of nothing. */
+@font-face {
+    font-family: 'Gordin';
+    src: url('fonts/gordin-regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+:root {
+    --win-teal: #008080;
+    --win-gray: #c0c0c0;
+    --win-white: #ffffff;
+    --win-black: #000000;
+    --win-dark-gray: #808080;
+    --win-light: #dfdfdf;
+    --win-blue: #000080;
+    --taskbar-height: 28px;
+}
+
+/* ---------------------------------------------------------------
+   Per-OS boot splashes (BOOT_SPLASHES in main.js).
+
+   This used to be one bitmap — images/gugclickerbg.jpg, a CORG_Clicker
+   picture — shown for all four OSes, with a separate crop for mobile.
+   Each era gets its own loading screen now, drawn in CSS so it fits any
+   window without a second asset. The logo comes from
+   OS_THEMES[os].bootLogo.
+   --------------------------------------------------------------- */
+.boot-splash {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #000; color: #fff; cursor: pointer;
+    transition: opacity 1s ease-out;
+    user-select: none;
+}
+.boot-splash img { -webkit-user-drag: none; }
+
+/* --- CORGOS 95: logo plate on the cloudy sky, small chunked bar --- */
+.boot-splash-win95 {
+    background: linear-gradient(180deg, #1b4c8c 0%, #3f7fc4 45%, #8fc0e8 78%, #d7e9f7 100%);
+}
+.boot95 { display: flex; flex-direction: column; align-items: center; gap: 7vh; }
+.boot95-plate { display: flex; align-items: center; gap: 22px; }
+.boot95-logo { width: clamp(64px, 9vw, 132px); height: auto; }
+.boot95-wordmark {
+    font-family: Tahoma, 'MS Sans Serif', sans-serif; font-weight: bold;
+    font-size: clamp(34px, 5vw, 76px); line-height: 1;
+    text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+}
+.boot95-small { font-size: 0.55em; }
+.boot95-ver { margin-left: 0.12em; }
+.boot95-bar {
+    width: clamp(150px, 22vw, 300px); height: 16px;
+    border: 2px solid; border-color: #808080 #fff #fff #808080; background: #c0c0c0;
+    padding: 1px;
+}
+/* the 95 bar fills in discrete chunks rather than sliding */
+.boot95-bar-fill {
+    height: 100%; width: 0;
+    background: repeating-linear-gradient(90deg, #000080 0 10px, #c0c0c0 10px 12px);
+    animation: boot95Fill 3.6s steps(12, end) forwards;
+}
+@keyframes boot95Fill { from { width: 0; } to { width: 100%; } }
+
+/* --- CORGOS XP: black field, wordmark, the three-block scroller --- */
+.boot-splash-winxp { background: #000; }
+.bootxp { position: absolute; inset: 0; }
+.bootxp-mid {
+    position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%);
+    display: flex; flex-direction: column; align-items: center;
+}
+.bootxp-logo { width: clamp(72px, 8vw, 128px); height: auto; }
+.bootxp-wordmark {
+    margin-top: 6px; font-family: 'Segoe UI', Tahoma, sans-serif; line-height: 0.95;
+    display: flex; align-items: baseline; gap: 0.08em;
+}
+.bootxp-small { font-size: clamp(16px, 1.7vw, 30px); font-weight: 400; }
+.bootxp-big { font-size: clamp(34px, 3.8vw, 68px); font-weight: bold; }
+.bootxp-ver { font-size: clamp(20px, 2.1vw, 38px); font-weight: bold; color: #ff8b1f; }
+.bootxp-bar {
+    margin-top: clamp(40px, 9vh, 120px);
+    width: clamp(180px, 16vw, 290px); height: 20px;
+    border: 2px solid #b8b8b8; border-radius: 10px;
+    padding: 2px; overflow: hidden;
+}
+/* three blocks that march across the bar and wrap, like the real one */
+.bootxp-blocks {
+    width: 44px; height: 100%;
+    background: repeating-linear-gradient(90deg, #3b5fdd 0 12px, transparent 12px 16px);
+    animation: bootxpMarch 2s linear infinite;
+}
+@keyframes bootxpMarch {
+    from { transform: translateX(-44px); }
+    to   { transform: translateX(clamp(180px, 16vw, 290px)); }
+}
+.bootxp-foot {
+    position: absolute; bottom: 3vh;
+    font-family: 'Segoe UI', Tahoma, sans-serif; font-size: clamp(11px, 1vw, 17px);
+}
+.bootxp-foot.left { left: 3vw; }
+.bootxp-foot.right { right: 3vw; font-weight: bold; font-style: italic; }
+
+/* --- CORGOS 7: "Starting CORGOS" under a glowing mark --- */
+.boot-splash-win7 { background: #000; }
+.boot7 { display: flex; flex-direction: column; align-items: center; }
+.boot7-logo {
+    width: clamp(90px, 11vw, 180px); height: auto;
+    filter: drop-shadow(0 0 22px rgba(90, 160, 255, 0.55));
+    animation: boot7Glow 2.6s ease-in-out infinite;
+}
+@keyframes boot7Glow {
+    0%, 100% { filter: drop-shadow(0 0 14px rgba(90, 160, 255, 0.35)); }
+    50%      { filter: drop-shadow(0 0 30px rgba(120, 190, 255, 0.75)); }
+}
+.boot7-text {
+    margin-top: 22px;
+    font-family: 'Segoe UI', 'Segoe UI Light', system-ui, sans-serif; font-weight: 300;
+    font-size: clamp(18px, 2vw, 34px); letter-spacing: 0.5px;
+}
+/* Three real spans coming in one at a time, rather than animating `content`
+   on a pseudo-element — that only works in Chrome/WebKit. One shared 1.6s
+   cycle, each dot joining a quarter later. */
+.boot7-dots span { opacity: 0; animation-duration: 1.6s; animation-timing-function: steps(1, end); animation-iteration-count: infinite; }
+.boot7-dots span:nth-child(1) { animation-name: boot7Dot1; }
+.boot7-dots span:nth-child(2) { animation-name: boot7Dot2; }
+.boot7-dots span:nth-child(3) { animation-name: boot7Dot3; }
+@keyframes boot7Dot1 { 0% { opacity: 0; } 25%, 100% { opacity: 1; } }
+@keyframes boot7Dot2 { 0% { opacity: 0; } 50%, 100% { opacity: 1; } }
+@keyframes boot7Dot3 { 0% { opacity: 0; } 75%, 100% { opacity: 1; } }
+.boot7-foot {
+    position: absolute; left: 0; right: 0; bottom: 4vh;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    font-family: 'Segoe UI', system-ui, sans-serif; font-size: clamp(10px, 0.9vw, 15px);
+}
+.boot7-copy { opacity: 0.75; }
+.boot7-brand { font-weight: bold; font-size: 1.25em; }
+
+/* --- CORGOS 11: logo with the ring of dots under it --- */
+.boot-splash-win11 { background: #000; }
+.boot11 { display: flex; flex-direction: column; align-items: center; gap: clamp(40px, 8vh, 90px); }
+.boot11-logo { width: clamp(64px, 7vw, 120px); height: auto; }
+/* the win11 spinner is a ring of dots chasing each other; one dot with a long
+   rotation and a stepped timing function reads the same at this size */
+.boot11-spinner {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.18);
+    border-top-color: #fff;
+    animation: boot11Spin 1s linear infinite;
+}
+@keyframes boot11Spin { to { transform: rotate(360deg); } }
+
+/* ---------------------------------------------------------------
+   XP-only bundled apps (Minesweeper / Paint / Notepad).
+   Their launchers only exist while the winxp theme is active.
+   --------------------------------------------------------------- */
+/* `.xp-only` used to hide Minesweeper, Paint and Notepad everywhere but XP.
+   They're on every theme now — they were the three best things in the whole
+   desktop and there was no reason a corgi's Windows 11 shouldn't ship them.
+   The class itself stays: it costs nothing and it's the hook to reach for the
+   next time something genuinely belongs to one era only (`.retro-only`, just
+   below, is still doing exactly that for Pong). */
+.xp-only { display: none !important; }
+
+/* ---------------------------------------------------------------
+   95/XP-only apps (Pong).
+   Windows shipped bundled time-wasters from 95 through XP and dropped
+   them afterwards, so this launcher exists on those two themes and
+   nowhere else. win95's bodyClass is '' (the base stylesheet *is* 95),
+   so there's no positive class to hang this on — the negation is the
+   same idiom the retro cursor rules at the end of this file use.
+   --------------------------------------------------------------- */
+.retro-only { display: none !important; }
+body:not(.win7-theme):not(.win11-theme) .desktop-icon.retro-only { display: flex !important; }
+body:not(.win7-theme):not(.win11-theme) .win95-program-item.retro-only { display: flex !important; }
+
+/* ---------------------------------------------------------------
+   11-only apps (Corgpilot).
+   The other side of `.retro-only`: an app that only exists on the
+   newest theme, because an AI button in the taskbar is the one thing
+   Windows 11 has that none of the others do. The win11 start menu is
+   its own markup and already 11-only, so only the desktop icon and the
+   taskbar button need hiding elsewhere.
+   --------------------------------------------------------------- */
+.win11-only { display: none !important; }
+body.win11-theme .desktop-icon.win11-only { display: flex !important; }
+body.win11-theme .task-btn.win11-only { display: inline-block !important; }
+
+/* Pong */
+.pong-shell { padding: 6px !important; background: #c0c0c0 !important; overflow: visible !important; }
+/* Same trick as .mine-board: shrink to the court's width and centre, so the
+   canvas doesn't sit left-aligned inside the window's 220px min-width. */
+.pong-board { width: fit-content; margin: 0 auto; }
+/* The same status bar Flappy Corg, Angry Corgs and Ad Smasher wear: grey face,
+   sunken panes, black text in the booted OS's font. Pong kept the old black
+   arcade marquee for a while after the others changed, which only moved the
+   odd-one-out from three windows to one. */
+.pong-hud {
+    display: flex; align-items: stretch; gap: 3px;
+    margin-bottom: 6px; padding: 3px; background: #c0c0c0;
+    border: 2px solid; border-color: #808080 #fff #fff #808080;
+    box-sizing: border-box;
+}
+.pong-stat {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
+    flex: 1; min-width: 0; padding: 2px 6px;
+    border: 1px solid; border-color: #808080 #fff #fff #808080;
+}
+.pong-stat label {
+    font-size: 11px; color: #000; opacity: 0.72; white-space: nowrap;
+}
+.pong-stat span {
+    font-size: 12px; font-weight: bold; color: #000;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2; white-space: nowrap;
+}
+.pong-canvas {
+    display: block;
+    /* The canvas backing store is sized in JS at device resolution; this only
+       controls layout. The court is wider than it is tall, so width is what
+       gets clamped, and aspect-ratio keeps it square-on on a narrow screen. */
+    /* The third term is the height cap expressed as a width (70vh x 800/520):
+       the court is a lot bigger than it used to be, and on a short window an
+       800x520 board at full width would push the HUD and the key legend off
+       the bottom of the screen. */
+    width: min(900px, 92vw, calc(70vh * 1.538));
+    aspect-ratio: 800 / 520;
+    background: #000;
+    border: 2px inset #c0c0c0;
+    image-rendering: auto;
+    /* The paddle follows the finger; the page shouldn't scroll with it. */
+    touch-action: none;
+}
+.pong-keys {
+    margin-top: 5px; text-align: center; font-size: 11px; color: #000;
+}
+.pong-keys b {
+    display: inline-block; padding: 0 3px; background: #dfdfdf;
+    border: 1px solid #808080; border-top-color: #fff; border-left-color: #fff;
+}
+
+/* Flappy Corg and Angry Corgs. Same shell as Pong — a canvas with a HUD strip
+   above it and a key legend below — because they're the same kind of window:
+   one canvas that is the whole app. The two share every rule they can; only
+   the canvas sizes differ, because the courts are different shapes. */
+.flap-shell, .angry-shell { padding: 6px !important; background: #c0c0c0 !important; overflow: visible !important; }
+.flap-board, .angry-board { width: fit-content; margin: 0 auto; }
+
+/* The scoreboard is a Windows status bar: the grey face of the window, split
+   into sunken panes with plain black text in the OS's own font. It used to be
+   a black-and-gold arcade readout, which was the one piece of these two games
+   still insisting they were something other than programs — the canvas inside
+   is bevels and dialog boxes, and the bar above it was a cabinet marquee.
+   This is the same construction Minesweeper's header uses a few hundred lines
+   up, because it is the same part of the same kind of window. */
+.flap-hud, .angry-hud {
+    display: flex; align-items: stretch; gap: 3px;
+    margin-bottom: 6px; padding: 3px; background: #c0c0c0;
+    border: 2px solid; border-color: #808080 #fff #fff #808080;
+    box-sizing: border-box;
+}
+.flap-stat, .angry-stat {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
+    flex: 1; min-width: 0; padding: 2px 6px;
+    background: #c0c0c0;
+    border: 1px solid; border-color: #808080 #fff #fff #808080;
+}
+/* Everything here inherits the body font, which is the booted OS's own — MS
+   Sans Serif on 95, Tahoma on XP, Segoe UI on 7 and 11 — so the two games read
+   as part of whichever Windows you're in. */
+.flap-stat label, .angry-stat label {
+    font-size: 11px; color: #000; opacity: 0.72; white-space: nowrap;
+}
+.flap-stat span, .angry-stat span {
+    font-size: 12px; font-weight: bold; color: #000;
+    /* Keeps a counter from shifting the label about as it counts up. */
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* Down to your last corgi, which is the only warning the level gives. */
+.angry-stat span.ac-danger { color: #a00000; animation: smashDanger 0.7s steps(2) infinite; }
+
+.flap-canvas, .angry-canvas {
+    display: block;
+    background: #008080;
+    border: 2px inset #c0c0c0;
+    /* Corg follows the finger; the page shouldn't scroll with him. */
+    touch-action: none;
+    cursor: pointer;
+}
+/* Layout only — the backing stores are sized at device resolution in JS. The
+   third term caps the height against the court's aspect ratio so the HUD and
+   legend still fit on a short window. */
+.flap-canvas { width: min(480px, 92vw, calc(66vh * 0.75)); aspect-ratio: 480 / 640; }
+.angry-canvas { width: min(900px, 94vw, calc(70vh * 1.73)); aspect-ratio: 900 / 520; cursor: crosshair; }
+
+.flap-keys, .angry-keys { margin-top: 5px; text-align: center; font-size: 11px; color: #000; }
+.flap-keys b, .angry-keys b {
+    display: inline-block; padding: 0 3px; background: #dfdfdf;
+    border: 1px solid #808080; border-top-color: #fff; border-left-color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .angry-stat span.ac-danger { animation: none; }
+}
+
+/* Ad Smasher. The game happens on the desktop, so there is no playfield to
+   style — only a scoreboard bar, a chain flash and the start/over card. The
+   overlay must never eat a pointer event: the ads and Corg underneath it are
+   the game, and a HUD that swallowed clicks would make the game unplayable. */
+.smash-overlay {
+    position: fixed; inset: 0; z-index: 9990;
+    pointer-events: none;
+    /* No font of its own: the desktop's, which is the booted OS's. */
+}
+/* ...so the two things you're meant to click opt back in. */
+.smash-bar, .smash-card { pointer-events: auto; }
+
+/* A floating toolbar in the OS's own chrome, the same status bar the two
+   canvas games wear — not a black arcade marquee sitting on the desktop. */
+.smash-bar {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: stretch; gap: 3px;
+    padding: 3px; background: #c0c0c0;
+    border: 2px solid; border-color: #fff #808080 #808080 #fff;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+    max-width: calc(100vw - 24px);
+}
+.smash-brand {
+    display: flex; align-items: center; gap: 6px; padding: 2px 10px 2px 6px;
+    color: #000; font-size: 11px; font-weight: bold; white-space: nowrap;
+}
+.smash-brand img { width: 16px; height: 16px; }
+.smash-stat {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 6px;
+    min-width: 78px; padding: 2px 6px;
+    border: 1px solid; border-color: #808080 #fff #fff #808080;
+}
+.smash-stat label {
+    font-size: 11px; color: #000; opacity: 0.72; white-space: nowrap;
+}
+.smash-stat span {
+    font-size: 12px; font-weight: bold; color: #000;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2; white-space: nowrap;
+}
+/* The radio's now-playing readout. Hidden until there is a station, which is
+   only while a round is running — a dead RADIO slot on the ready card would be
+   a stat that never fills in. Wider than a score, and it wraps nothing: track
+   names are short and the bar is already at its max width. */
+.smash-radio { display: none; min-width: 128px; }
+.smash-radio.on { display: flex; }
+.smash-radio span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+    font-weight: normal;
+}
+
+/* The ad counter is the game's only warning that the round is about to end,
+   so it goes red for the last few slots (toggled in asUpdateHud). */
+.smash-stat span.as-danger { color: #a00000; animation: smashDanger 0.7s steps(2) infinite; }
+@keyframes smashDanger { 50% { opacity: 0.35; } }
+
+.smash-close {
+    width: 22px; background: #c0c0c0; color: #000; cursor: pointer;
+    border: 2px solid; border-color: #fff #808080 #808080 #fff;
+    font-family: inherit; font-size: 13px; line-height: 1; font-weight: bold;
+}
+.smash-close:active { border-style: inset; }
+
+/* The chain shout. Under the bar, out of the way of the desktop. */
+.smash-flash {
+    position: absolute; top: 58px; left: 50%; transform: translateX(-50%) scale(0.9);
+    padding: 4px 14px;
+    font-size: 18px; font-weight: bold; letter-spacing: 1px;
+    color: #000; background: #c0c0c0;
+    border: 2px solid; border-color: #fff #808080 #808080 #fff;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+    opacity: 0; transition: opacity 0.15s ease, transform 0.15s ease;
+    white-space: nowrap;
+}
+.smash-flash.on { opacity: 1; transform: translateX(-50%) scale(1); }
+
+/* The start/over card is a dialog box, like the ones the other two games draw
+   on their canvases — same reason: in this operating system, that is what
+   tells you something. */
+.smash-card {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: min(500px, 90vw); padding: 20px 24px 18px;
+    text-align: center; color: #000;
+    background: #c0c0c0;
+    border: 2px solid; border-color: #fff #808080 #808080 #fff;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+}
+.smash-card h2 { margin: 0 0 12px; font-size: 20px; }
+.smash-card p { margin: 0 0 18px; font-size: 12px; line-height: 1.6; color: #000; }
+.smash-card p b { font-weight: bold; }
+.smash-play-btn {
+    min-width: 110px; padding: 6px 22px; cursor: pointer;
+    background: #c0c0c0; color: #000;
+    border: 2px solid; border-color: #fff #808080 #808080 #fff;
+    font-family: inherit; font-size: 12px; font-weight: bold;
+}
+.smash-play-btn:active { border-color: #808080 #fff #fff #808080; }
+.smash-card-keys { margin-top: 12px; font-size: 11px; color: #000; opacity: 0.7; }
+.smash-card-keys b {
+    display: inline-block; padding: 0 4px; background: #dfdfdf;
+    border: 1px solid #808080; border-top-color: #fff; border-left-color: #fff;
+}
+
+/* Kevbo mode's switch, on the card between the rules and the START button —
+   it changes the rules, so it reads as part of them rather than as a setting
+   tucked away somewhere else. */
+.smash-toggle {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin: 0 0 8px; padding: 5px 12px; cursor: pointer;
+    background: #c0c0c0; color: #000;
+    border: 2px solid; border-color: #fff #808080 #808080 #fff;
+    font-size: 12px; font-weight: bold; letter-spacing: 0.5px;
+    user-select: none;
+}
+.smash-toggle input { cursor: pointer; margin: 0; }
+.smash-toggle:has(input:checked) { background: #efd76a; }
+.smash-card p.smash-toggle-note {
+    margin: 0 0 16px; font-size: 11px; line-height: 1.5; opacity: 0.8;
+}
+
+/* The same badge, mid-round, on the scoreboard bar: black-on-yellow, the
+   colour of a warning label, because that's what it is. Off by default —
+   asUpdateHud() adds .on. */
+.smash-badge {
+    display: none; align-items: center; padding: 2px 8px;
+    background: #efd76a; color: #000;
+    border: 2px solid; border-color: #fff #808080 #808080 #fff;
+    font-size: 11px; font-weight: bold; letter-spacing: 1px;
+}
+.smash-badge.on { display: flex; }
+
+/* Corg, in a Kevbo grip. The wriggle runs exactly as long as the hold does
+   (--corg-hold-ms is set from the same constant that arms the timer), so it
+   is a countdown you can read without a bar: the shake tightens right up to
+   the moment Corg slips free. */
+.guggy-container.corg-slipping .corg-img {
+    animation: corgSlip var(--corg-hold-ms, 550ms) linear forwards;
+    transform-origin: 50% 100%;
+}
+@keyframes corgSlip {
+    0%   { transform: rotate(0deg) scale(1); }
+    40%  { transform: rotate(-3deg) scale(0.99); }
+    70%  { transform: rotate(4deg) scale(0.97); }
+    85%  { transform: rotate(-6deg) scale(0.96); }
+    100% { transform: rotate(8deg) scale(0.94); }
+}
+
+/* And just after the throw, while he's off limits: greyed out and refusing
+   the cursor, so a failed grab reads as a rule and not as a dropped click. */
+.guggy-container.corg-spent { cursor: not-allowed; }
+.guggy-container.corg-spent .corg-img { filter: grayscale(0.75) brightness(0.85); opacity: 0.7; }
+
+@media (prefers-reduced-motion: reduce) {
+    .guggy-container.corg-slipping .corg-img { animation: none; }
+}
+
+/* Corg, moving fast enough to break glass. This is the entire tutorial: the
+   light comes on exactly when a hit would shatter instead of shove, because
+   adsmasher.js reads the threshold off AD_SHATTER_SPEED rather than keeping
+   its own copy of it. */
+.guggy-icon-group.corg-hot {
+    filter: drop-shadow(0 0 10px #7bf0ff) drop-shadow(0 0 22px #4bd2ff) brightness(1.15);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .smash-stat span.as-danger { animation: none; }
+    .smash-flash { transition: none; }
+}
+
+@media screen and (max-width: 800px) {
+    .smash-bar { gap: 2px; padding: 3px; }
+    .smash-brand { display: none; }
+    .smash-stat { min-width: 50px; padding: 2px 5px; }
+    .smash-stat span { font-size: 13px; }
+    /* The score is what a narrow bar is for; the radio still plays, it just
+       stops announcing itself. */
+    .smash-radio.on { display: none; }
+}
+
+/* Minesweeper */
+.mine-shell { padding: 6px !important; background: #c0c0c0 !important; overflow: visible !important; }
+/* The window has a 220px min-width but the 9x9 board is only ~150px wide, so
+   without this the board hugged the left edge. fit-content + auto margins keep
+   the HUD and the grid the same width and centre them together. */
+.mine-board { width: fit-content; margin: 0 auto; }
+.mine-hud {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px; padding: 4px 5px; background: #c0c0c0;
+    border: 2px solid; border-color: #808080 #fff #fff #808080;
+    box-sizing: border-box;
+}
+.mine-counter { display: flex; background: #000; padding: 1px; }
+.mine-counter img { display: block; width: 13px; height: 23px; }
+.mine-face {
+    width: 26px; height: 26px; padding: 0; cursor: pointer;
+    background: #c0c0c0; border: 2px solid; border-color: #fff #808080 #808080 #fff;
+}
+.mine-face:active { border-color: #808080 #fff #fff #808080; }
+.mine-face img { display: block; width: 100%; height: 100%; }
+.mine-grid {
+    display: grid; gap: 0;
+    border-top: 3px solid #808080; border-left: 3px solid #808080;
+    border-right: 3px solid #f5f5f5; border-bottom: 3px solid #f5f5f5;
+    background: #c0c0c0; width: fit-content;
+}
+.mine-cell { position: relative; width: 16px; height: 16px; cursor: pointer; }
+/* covered/open tiles are CSS bevels; sprites only overlay numbers & mines */
+.mine-bg { position: absolute; inset: 0; box-sizing: border-box; background: #c0c0c0; }
+.mine-bg.mine-cover {
+    border-left: 2px solid #f5f5f5; border-top: 2px solid #f5f5f5;
+    border-right: 2px solid #808080; border-bottom: 2px solid #808080;
+}
+.mine-bg.mine-open { border-left: 1px solid #808080; border-top: 1px solid #808080; }
+.mine-cell img { position: absolute; inset: 0; width: 16px; height: 16px; pointer-events: none; -webkit-user-drag: none; }
+
+/* Paint */
+.paint-shell { padding: 6px !important; background: #ece9d8 !important; }
+.paint-toolbar { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; font-size: 12px; }
+.paint-toolbar label { display: flex; align-items: center; gap: 4px; }
+.paint-toolbar input[type=range] { width: 90px; }
+.paint-tool.active { border-color: #808080 #fff #fff #808080 !important; font-weight: bold; }
+.paint-sep { width: 1px; height: 18px; background: #9a9a8a; }
+.paint-palette { display: grid; grid-template-columns: repeat(10, 20px); gap: 2px; margin-bottom: 6px; }
+.paint-swatch { width: 20px; height: 20px; padding: 0; cursor: pointer; border: 1px solid #6b6b5b; }
+.paint-swatch.active { outline: 2px solid #0831d9; outline-offset: -4px; }
+.paint-canvas-wrap { background: #808080; padding: 2px; overflow: auto; }
+#paint-canvas { display: block; background: #fff; cursor: crosshair; max-width: 100%; touch-action: none; }
+
+/* Notepad */
+.notepad-menubar { display: flex; gap: 14px; padding: 3px 8px; font-size: 12px; background: #ece9d8; border-bottom: 1px solid #aca899; flex-shrink: 0; }
+.notepad-menubar span { cursor: default; }
+.notepad-text {
+    flex: 1; min-height: 0; width: 100%; resize: none; box-sizing: border-box;
+    border: none; outline: none; padding: 4px 6px;
+    font-family: 'Lucida Console', Consolas, monospace; font-size: 13px; line-height: 1.35;
+    background: #fff; color: #000;
+}
+
+/* ---------------------------------------------------------------
+   Per-OS login screens (between the boot splash and the desktop)
+   --------------------------------------------------------------- */
+#login-screen { display: none; position: fixed; inset: 0; z-index: 1000001; }
+#login-screen.open { display: flex; }
+#login-screen.fading { opacity: 0; transition: opacity 0.5s ease-out; }
+
+/* --- CORGOS 95: classic network-password dialog --- */
+#login-screen.login-win95 {
+    background: var(--win-teal);
+    align-items: center;
+    justify-content: center;
+    font-family: Tahoma, 'MS Sans Serif', sans-serif;
+}
+.login95-dialog {
+    width: 420px; max-width: 92vw;
+    background: var(--win-gray);
+    border: 2px solid; border-color: var(--win-white) var(--win-black) var(--win-black) var(--win-white);
+    box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), 4px 4px 10px rgba(0,0,0,0.5);
+}
+.login95-title {
+    background: var(--win-blue); color: #fff; font-weight: bold; font-size: 13px; padding: 3px 6px;
+}
+.login95-body { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; padding: 16px; align-items: start; }
+.login95-body img { width: 40px; height: 40px; image-rendering: pixelated; }
+.login95-fields p { margin: 0 0 12px; font-size: 12px; }
+.login95-fields label { display: block; font-size: 12px; margin-bottom: 8px; }
+.login95-fields input { width: 150px; margin-left: 6px; }
+.login95-buttons { display: flex; flex-direction: column; gap: 6px; }
+.login95-buttons button { width: 84px; }
+
+/* --- CORGOS XP: the welcome screen, drawn in CSS --- */
+/* This used to stretch images/winxp/login.jpg over the whole screen. That file
+   is a small (12KB) screenshot, so full-bleed it came out visibly blurry next
+   to the CSS-drawn "Welcome" state that follows it. Both stages are drawn the
+   same way now — same bars, same divider, same field — so they're equally
+   sharp and cut between each other cleanly. */
+#login-screen.login-winxp {
+    flex-direction: column;
+    background: #5b7edc;
+    font-family: Tahoma, sans-serif;
+    color: #fff;
+}
+/* the blue field, shared by the login stage and the "Welcome" stage */
+.loginxp-field {
+    display: flex; flex-direction: column;
+    background:
+        radial-gradient(120% 90% at 50% 45%, rgba(255,255,255,0.16), rgba(255,255,255,0) 70%),
+        linear-gradient(180deg, #5b7edc 0%, #4a6fd4 55%, #3f63cd 100%);
+}
+.loginxp-shell { position: absolute; inset: 0; }
+
+.loginxp-bar { flex-shrink: 0; }
+.loginxp-bar.top {
+    height: 12%;
+    background: linear-gradient(to bottom, #04309d 0%, #1c3fae 70%, #3a5fc8 100%);
+    border-bottom: 2px solid #ff9b00;
+}
+.loginxp-bar.bottom {
+    height: 14%;
+    background: linear-gradient(to bottom, #3a5fc8 0%, #1c31a4 60%, #04309d 100%);
+    border-top: 2px solid #ff9b00;
+}
+.loginxp-mid { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; gap: 4vw; }
+.loginxp-divider { width: 1px; height: 34vh; background: rgba(255,255,255,0.6); }
+
+/* left half of the login stage: wordmark + the "click your user name" line */
+.loginxp-left { width: 32vw; max-width: 420px; text-align: right; }
+.loginxp-logo { line-height: 1; margin-bottom: 18px; }
+.loginxp-logo-brand {
+    font-size: clamp(28px, 4vw, 46px); font-weight: bold; letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+}
+.loginxp-logo-os {
+    font-size: clamp(16px, 2vw, 24px); font-weight: normal; margin-left: 6px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+}
+.loginxp-tagline { font-size: clamp(13px, 1.3vw, 17px); text-shadow: 1px 1px 3px rgba(0,0,0,0.45); }
+
+/* right half: the user tile and the password box */
+.loginxp-right { width: 32vw; max-width: 420px; }
+.loginxp-user { display: flex; align-items: center; gap: 14px; width: fit-content; }
+.loginxp-user img { width: 62px; height: 62px; border: 3px solid #fff; border-radius: 4px; background: #fff; object-fit: contain; }
+.loginxp-user span { font-size: 19px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+/* --- XP "Welcome", shown while it logs you in --- */
+.loginxp-welcome {
+    display: none;
+    position: absolute; inset: 0;
+    color: #fff;
+    font-family: Tahoma, sans-serif;
+}
+.loginxp-welcome.visible { display: flex; }
+.loginxp-welcome-user { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.loginxp-welcome-user img {
+    width: 92px; height: 92px; border: 3px solid #fff; border-radius: 4px;
+    background: #fff; object-fit: contain;
+}
+.loginxp-welcome-user span { font-size: 18px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+.loginxp-welcome-text {
+    font-size: clamp(30px, 4.4vw, 54px);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.45);
+}
+
+/* --- CORGOS 7: blurred wallpaper + avatar --- */
+#login-screen.login-win7 {
+    align-items: center; justify-content: center;
+    background: url('images/win7/loginbackground.jpg') center/cover no-repeat, #1b4d80;
+    font-family: 'Segoe UI', system-ui, sans-serif; color: #fff;
+}
+#login-screen.login-win7::before { content: ''; position: absolute; inset: 0; background: rgba(10, 40, 75, 0.28); }
+.login7-inner { position: relative; text-align: center; }
+.login7-avatar {
+    width: 128px; height: 128px; margin: 0 auto 14px;
+    border: 2px solid rgba(255,255,255,0.9); border-radius: 4px;
+    background: rgba(255,255,255,0.9); overflow: hidden;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.45);
+}
+.login7-avatar img { width: 100%; height: 100%; object-fit: contain; }
+.login7-name { font-size: 26px; font-weight: 300; margin-bottom: 16px; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+.login7-row { display: flex; gap: 8px; justify-content: center; }
+.login7-pass {
+    width: 190px; padding: 6px 10px; font-size: 14px;
+    border: 1px solid #7ba7cc; border-radius: 3px; background: rgba(255,255,255,0.92); color: #333;
+}
+.login7-go {
+    width: 36px; border: 1px solid #7ba7cc; border-radius: 3px; cursor: pointer;
+    background: linear-gradient(180deg, #f2f9ff, #cfe6fa); color: #1b4d80; font-size: 15px;
+}
+.login7-go:hover { background: linear-gradient(180deg, #ffffff, #b9dcf7); }
+
+/* --- CORGOS 11: acrylic lock screen --- */
+#login-screen.login-win11 {
+    align-items: center; justify-content: center;
+    background: url('images/win11/loginwallpaper.jpg') center/cover no-repeat, #1b2a4a;
+    font-family: 'Segoe UI', system-ui, sans-serif; color: #fff;
+}
+#login-screen.login-win11::before { content: ''; position: absolute; inset: 0; background: rgba(8, 16, 38, 0.35); }
+/* --- CORGOS 11 lock screen: clock first, PIN box after you raise it --- */
+/* The clock is measured off a real Windows 11 lock screen: semibold (not the
+   thin weight this used to use), sitting in the upper third rather than dead
+   centre, and tight under the time. Windows also omits the AM/PM — see the
+   formatter in startWin11Lock(). */
+.login11-lock {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+    padding-top: 12vh; gap: 2px; cursor: grab; user-select: none;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
+}
+.login11-lock:active { cursor: grabbing; }
+.login11-lock.lifted { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+.login11-clock {
+    font-size: clamp(56px, 6vw, 130px); font-weight: 600; line-height: 1.1;
+    letter-spacing: -0.02em; text-shadow: 0 2px 14px rgba(0,0,0,0.35);
+}
+.login11-date {
+    font-size: clamp(15px, 1.6vw, 34px); font-weight: 600;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.35);
+}
+/* Real Windows has no hint here, so it's kept out of the clock block entirely
+   and parked at the bottom of the screen — the game still needs to tell you
+   the screen is liftable. */
+.login11-lock-hint {
+    position: absolute; left: 0; right: 0; bottom: 7vh; text-align: center;
+    font-size: 13px; font-weight: 400; opacity: 0.7;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+}
+
+/* the sign-in half only exists once the lock screen has been raised */
+.login11-inner { opacity: 0; pointer-events: none; transition: opacity 0.35s ease 0.15s; }
+.login11-inner.visible { opacity: 1; pointer-events: auto; }
+
+.login11-inner { position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.login11-avatar {
+    width: 128px; height: 128px; border-radius: 50%; overflow: hidden;
+    background: rgba(255,255,255,0.9); box-shadow: 0 8px 26px rgba(0,0,0,0.4);
+}
+.login11-avatar img { width: 100%; height: 100%; object-fit: contain; }
+.login11-name { font-size: 30px; font-weight: 300; text-shadow: 0 1px 6px rgba(0,0,0,0.5); }
+.login11-pass {
+    width: 250px; padding: 9px 14px; font-size: 14px; text-align: center;
+    border: none; border-bottom: 2px solid rgba(255,255,255,0.75);
+    border-radius: 4px 4px 0 0; background: rgba(255,255,255,0.86); color: #222;
+}
+.login11-go {
+    width: 250px; padding: 8px; font-size: 14px; cursor: pointer;
+    background: rgba(255,255,255,0.22); color: #fff;
+    border: 1px solid rgba(255,255,255,0.5); border-radius: 4px;
+    backdrop-filter: blur(8px);
+}
+.login11-go:hover { background: rgba(255,255,255,0.34); }
+
+/* --- shared bits of the (now real) login form --- */
+/* XP has no password box of its own upstream, so it gets one here */
+.loginxp-passrow { display: flex; gap: 8px; align-items: center; margin: 14px 0 0 4px; }
+.loginxp-passrow .login-pass {
+    width: 190px; padding: 5px 9px; font-size: 14px;
+    border: 2px inset #d6d6d6; border-radius: 2px; background: #fff; color: #222;
+}
+.loginxp-go {
+    width: 34px; padding: 4px 0; cursor: pointer; font-size: 14px; color: #1b4d80;
+    border: 2px outset #e8f0ff; border-radius: 3px;
+    background: linear-gradient(180deg, #f2f9ff, #cfe6fa);
+}
+.loginxp-go:hover { background: linear-gradient(180deg, #ffffff, #b9dcf7); }
+
+/* wrong-password message + the "hint: corg" line, styled per theme below */
+.login-error { min-height: 1.2em; font-size: 12px; }
+.login-hint { font-size: 11px; opacity: 0.75; }
+
+#login-screen.login-win95 .login-error { color: #a00000; margin: 2px 0 0; }
+#login-screen.login-win95 .login-hint { color: var(--win-dark-gray); }
+
+#login-screen.login-winxp .login-error { color: #ffd34d; margin: 8px 0 0 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+#login-screen.login-winxp .login-hint { margin-left: 4px; }
+
+#login-screen.login-win7 .login-error,
+#login-screen.login-win10 .login-error,
+#login-screen.login-win11 .login-error { color: #ffd7d7; margin-top: 10px; text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+#login-screen.login-win7 .login-hint,
+#login-screen.login-win10 .login-hint,
+#login-screen.login-win11 .login-hint { text-shadow: 0 1px 4px rgba(0,0,0,0.6); }
+
+/* --- CORGOS 10: lock screen with bottom-left clock and spotlight backdrop --- */
+#login-screen.login-win10 {
+    align-items: center; justify-content: center;
+    background: url('images/win10/lockscreen.png') center/cover no-repeat, #001a33;
+    font-family: 'Segoe UI', system-ui, sans-serif; color: #fff;
+}
+#login-screen.login-win10::before { content: ''; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.25); }
+
+.login10-lock {
+    position: absolute; inset: 0; z-index: 2;
+    cursor: grab; user-select: none;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s ease;
+}
+.login10-lock:active { cursor: grabbing; }
+.login10-lock.lifted { transform: translateY(-100%); opacity: 0; pointer-events: none; }
+.login10-clock-group {
+    position: absolute;
+    left: clamp(24px, 4vw, 64px);
+    bottom: clamp(32px, 6vh, 72px);
+    text-align: left;
+}
+.login10-clock {
+    font-size: clamp(64px, 7.5vw, 112px);
+    font-weight: 300;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+    font-family: 'Segoe UI Light', 'Segoe UI', sans-serif;
+}
+.login10-date {
+    font-size: clamp(18px, 2vw, 32px);
+    font-weight: 300;
+    margin-top: 6px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    font-family: 'Segoe UI Light', 'Segoe UI', sans-serif;
+}
+.login10-network-icon {
+    position: absolute;
+    right: clamp(24px, 4vw, 48px);
+    bottom: clamp(24px, 4vh, 48px);
+    opacity: 0.85;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+.login10-lock-hint {
+    position: absolute; left: 0; right: 0; bottom: 3vh; text-align: center;
+    font-size: 13px; font-weight: 400; opacity: 0.7;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+}
+
+.login10-inner {
+    position: relative; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px;
+    opacity: 0; pointer-events: none; transition: opacity 0.35s ease 0.15s;
+}
+.login10-inner.visible { opacity: 1; pointer-events: auto; }
+.login10-avatar {
+    width: 128px; height: 128px; border-radius: 50%; overflow: hidden;
+    background: rgba(255,255,255,0.9); box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+}
+.login10-avatar img { width: 100%; height: 100%; object-fit: contain; }
+.login10-name { font-size: 30px; font-weight: 300; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+.login10-row { display: flex; align-items: stretch; justify-content: center; width: 260px; }
+.login10-pass {
+    flex: 1; padding: 7px 12px; font-size: 14px;
+    border: 2px solid rgba(255,255,255,0.7); border-right: none;
+    background: rgba(0,0,0,0.45); color: #fff; outline: none;
+}
+.login10-go {
+    width: 36px; border: 2px solid rgba(255,255,255,0.7); cursor: pointer;
+    background: rgba(255,255,255,0.2); color: #fff; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+}
+.login10-go:hover { background: rgba(255,255,255,0.35); }
+
+/* Fake shutdown fade, shown between the desktop and the boot menu */
+#shutdown-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000002;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 1.1s ease-in;
+    pointer-events: all;
+}
+#shutdown-overlay.on { opacity: 1; }
+#shutdown-overlay .shutdown-text {
+    color: #e8e8e8;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-weight: 300;
+    font-size: clamp(18px, 2.2vw, 28px);
+    letter-spacing: 0.4px;
+    opacity: 0;
+    animation: shutdownTextIn 0.8s ease-out 0.5s forwards;
+}
+@keyframes shutdownTextIn { to { opacity: 1; } }
+
+/* =====================================================================
+   Boot manager, dressed as SteamOS gaming mode.
+
+   Deck gaming mode is three bands: a thin status bar, a shelf of capsule
+   artwork, and a controller legend pinned to the bottom edge. Everything
+   below builds those three; the artwork inside each capsule is still the
+   CSS install media further down this file, so the floppy/CD/DVD/USB and
+   all their surface detail are untouched by the reskin.
+   ===================================================================== */
+#boot-menu-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000000;
+    color: #fff;
+    /* Deck's shell is a dark blue-slate that lifts towards the top, over a
+       blown-up piece of the selected game's art. Corg is the art. */
+    background:
+        radial-gradient(ellipse 120% 80% at 50% -10%, rgba(90, 130, 165, 0.35), rgba(90, 130, 165, 0) 60%),
+        linear-gradient(180deg, #1b2838 0%, #10161e 55%, #0a0e13 100%);
+    font-family: 'Motiva Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+}
+#boot-menu-screen.open { display: block; }
+
+/* The watermark: one enormous, very faint Corg behind the shelf, standing in
+   for the hero art gaming mode blurs behind its library. */
+#boot-menu-screen::before {
+    content: '';
+    position: absolute; right: -6%; top: -12%;
+    width: 70vh; height: 70vh;
+    background: url('images/corg.png') no-repeat center / contain;
+    opacity: 0.055;
+    filter: blur(1px);
+    pointer-events: none;
+}
+
+.deck-shell {
+    position: relative;
+    height: 100%;
+    display: flex; flex-direction: column;
+    box-sizing: border-box;
+}
+
+/* --- status bar ---------------------------------------------------------- */
+.deck-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 22px;
+    font-size: 13px; letter-spacing: 0.4px;
+    color: rgba(255, 255, 255, 0.82);
+    flex-shrink: 0;
+}
+.deck-top-left { display: flex; align-items: center; gap: 9px; font-weight: 600; letter-spacing: 1.6px; opacity: 0.75; }
+.deck-top-logo { width: 18px; height: 18px; }
+.deck-top-right { display: flex; align-items: center; gap: 14px; }
+.deck-top-icon {
+    width: 17px; height: 17px;
+    fill: none; stroke: rgba(255, 255, 255, 0.8); stroke-width: 1.7;
+    stroke-linecap: round;
+}
+.deck-clock { font-variant-numeric: tabular-nums; font-size: 13px; }
+.deck-avatar {
+    width: 26px; height: 26px; border-radius: 4px; overflow: hidden;
+    background: #2a3a4a; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+.deck-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+/* --- shelf --------------------------------------------------------------- */
+.deck-body {
+    flex: 1;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 0 22px;
+    min-height: 0;
+}
+.deck-heading {
+    font-size: clamp(19px, 2.2vw, 27px); font-weight: 700;
+    letter-spacing: 0.2px; margin-bottom: 14px;
+}
+/* The shelf: four capsules in one fixed row.
+   It used to be a scroller with a hero that widened and a track that slid to
+   re-centre it, and that was unusable with a mouse — pointing at a capsule
+   changed the layout, which slid a different capsule under the cursor, which
+   selected in turn, and the row ran away sideways. The middle two OSes could
+   not be picked at all. Nothing here resizes or moves on hover any more: the
+   capsules share the row equally, every one is captioned all the time, and
+   selection is a highlight. */
+.deck-shelf {
+    display: flex; align-items: stretch; justify-content: center;
+    gap: clamp(8px, 1.4vw, 18px);
+    padding: 6px 0 10px;
+}
+
+/* A capsule. `flex: 1 1 0` with a max-width is what keeps all four on screen
+   at any window size without a scroller: they share the row and shrink
+   together rather than overflowing it. */
+.deck-capsule {
+    position: relative;
+    flex: 1 1 0; min-width: 0;
+    max-width: 300px;
+    height: clamp(200px, 34vh, 300px);
+    border-radius: 6px;
+    overflow: hidden;
+    cursor: pointer;
+    background:
+        linear-gradient(200deg, var(--capsule-tint, #1c6a86) 0%,
+                                rgba(5, 8, 11, 0.45) 58%,
+                                #05080b 100%);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+    /* Colour and shadow only. Nothing that changes the box. */
+    transition: box-shadow 0.18s ease, filter 0.18s ease;
+    filter: saturate(0.78) brightness(0.76);
+}
+.deck-capsule.selected {
+    filter: none;
+    box-shadow: 0 0 0 3px #fff, 0 12px 34px rgba(0, 0, 0, 0.6);
+}
+.deck-capsule:focus-visible { outline: 3px solid #8fd0ff; outline-offset: 2px; }
+
+/* The install media is fixed at 180x196, so it's scaled here to sit in a
+   capsule rather than sized to it. bootLayoutShelf() used to write this as an
+   inline style; it's CSS now because the two sizes no longer depend on
+   anything JS knows. A transform doesn't affect layout, so the highlighted
+   disc growing a little can't push its neighbours around. */
+.boot-media { transform: scale(0.76); }
+.deck-capsule.selected .boot-media,
+.deck-capsule:hover .boot-media { transform: scale(0.9); }
+
+/* The art well. Perspective lives here so each capsule foreshortens its own
+   object; .boot-media inside is centred by its own margins. */
+.deck-capsule-art {
+    position: absolute; inset: 0; bottom: 96px;
+    perspective: 850px;
+    perspective-origin: 50% 45%;
+}
+/* A soft vignette so the plate's text always has something to sit on. */
+.deck-capsule-art::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.7) 100%);
+    pointer-events: none;
+}
+
+/* Always visible, on every capsule — you have to be able to read what a tile
+   is before you point at it, not after. */
+.deck-capsule-plate {
+    position: absolute; left: 12px; right: 12px; bottom: 12px;
+    pointer-events: none;
+}
+.deck-capsule-name {
+    font-size: clamp(14px, 1.5vw, 20px); font-weight: 700;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.deck-capsule-tag {
+    margin-top: 3px;
+    font-size: clamp(9px, 0.75vw, 11px); letter-spacing: 0.6px;
+    color: rgba(255, 255, 255, 0.7);
+    text-transform: uppercase;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+/* The green pill: the "this click boots it" promise. Reserved space on every
+   capsule (visibility, not display) so showing it on the highlighted one
+   cannot nudge anything else. */
+.deck-capsule-play {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 9px; padding: 5px 14px; border-radius: 4px;
+    background: #4c9a4c; color: #fff;
+    font-size: 11px; font-weight: 700; letter-spacing: 1.3px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    visibility: hidden;
+}
+.deck-capsule.selected .deck-capsule-play,
+.deck-capsule:hover .deck-capsule-play { visibility: visible; }
+.deck-capsule:hover .deck-capsule-play { background: #5bb35b; }
+.deck-play { color: #fff; }
+
+.deck-hint-mouse { letter-spacing: 1px; color: rgba(255, 255, 255, 0.6); font-size: 11px; }
+.deck-hint-name { color: #fff; font-weight: 700; font-style: normal; }
+@media screen and (max-width: 900px) { .deck-hint-mouse { display: none; } }
+
+/* --- controller legend --------------------------------------------------- */
+.deck-bottombar {
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 20px;
+    background: rgba(0, 0, 0, 0.55);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+    font-size: 12px; letter-spacing: 1px;
+}
+.deck-bottom-left { display: flex; align-items: center; gap: 10px; }
+.deck-pill {
+    padding: 4px 13px; border-radius: 999px;
+    background: #e9edf2; color: #12161c;
+    font-weight: 700; font-size: 11px; letter-spacing: 1.2px;
+}
+.deck-pill-menu {
+    background: transparent; color: rgba(255, 255, 255, 0.85);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+.deck-bottom-right { display: flex; align-items: center; gap: 18px; color: rgba(255, 255, 255, 0.85); }
+.deck-hint { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 11px; }
+.deck-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 19px; height: 19px; border-radius: 50%;
+    background: #2a3540; color: #fff;
+    font-size: 11px; font-weight: 700; font-style: normal;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+.deck-btn-a { background: #3b6e3b; }
+.deck-btn-b { background: #7a3232; }
+
+@media screen and (max-width: 760px) {
+    .deck-body { padding: 0 12px; }
+    .deck-capsule { height: clamp(160px, 30vh, 220px); }
+    .deck-heading { font-size: 18px; margin-bottom: 10px; }
+    .deck-topbar { padding: 8px 14px; }
+    .deck-bottombar { padding: 7px 12px; }
+    .deck-capsule-play { margin-top: 6px; padding: 4px 10px; font-size: 10px; }
+    .deck-capsule-art { bottom: 82px; }
+}
+
+/* =====================================================================
+   Capsule artwork — each OS is the thing you'd have installed it from.
+   Floppy for 95, CD for XP, DVD for 7, USB stick for 11, which is just the
+   real progression of what a PC booted off between 1995 and now.
+
+   All four objects are built out of divs and CSS 3D transforms, not models or
+   sprites, for the same reason the XP login screen is drawn in CSS rather than
+   screenshotted: it stays sharp at any size and it themes with everything
+   else. They predate the gaming-mode reskin and survived it unchanged: only
+   the frame around them became a Deck capsule. bootLayoutShelf() in main.js
+   writes the per-capsule scale; every rule below is the objects themselves.
+   ===================================================================== */
+
+/* One object, centred in its capsule's art well. The centring is margins, not
+   translate, so the scale bootLayoutShelf() writes and the idle animation on
+   .boot-obj inside never have to know about each other. */
+.boot-media {
+    position: absolute;
+    left: 50%; top: 45%;
+    width: 180px; height: 196px;
+    margin: -98px 0 0 -90px;
+    transform-style: preserve-3d;
+    cursor: pointer;
+    transition: transform 0.32s cubic-bezier(0.22, 0.9, 0.28, 1);
+}
+/* The resting pose is per object type, via --rx/--ry, and the idle animation
+   swings around whatever those are. A box only needs a few degrees to look
+   solid — you can see its side faces. A disc is a flat circle, and at 16° it
+   foreshortens by 4%, i.e. not at all: it needs a real tilt before it stops
+   looking like a printed pinwheel and starts looking like an object lying in
+   space. Hence the much steeper rest angle on .o-disc. */
+.boot-obj {
+    position: absolute; left: 50%; top: 50%;
+    --rx: 6deg;
+    --ry: -20deg;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rx)) rotateY(var(--ry));
+    will-change: transform;
+}
+.o-disc { --rx: 22deg; --ry: -26deg; }
+
+.boot-media.selected .boot-obj { animation: bootIdle 5.5s ease-in-out infinite; }
+@keyframes bootIdle {
+    0%, 100% { transform: translateY(-5px) rotateX(calc(var(--rx) + 3deg)) rotateY(calc(var(--ry) - 9deg)); }
+    50%      { transform: translateY(5px)  rotateX(calc(var(--rx) - 4deg)) rotateY(calc(var(--ry) + 18deg)); }
+}
+
+/* --- the generic box: six faces off one --d (depth) variable ------------- */
+.b3 { position: absolute; transform-style: preserve-3d; }
+.b3 > .f { position: absolute; background: inherit; }
+.b3 > .f-front  { inset: 0; transform: translateZ(calc(var(--d) / 2)); }
+.b3 > .f-back   { inset: 0; transform: translateZ(calc(var(--d) / -2)) rotateY(180deg); }
+.b3 > .f-left   { top: 0; left: 0;  width: var(--d); height: 100%; transform: translateX(calc(var(--d) / -2)) rotateY(-90deg); }
+.b3 > .f-right  { top: 0; right: 0; width: var(--d); height: 100%; transform: translateX(calc(var(--d) / 2)) rotateY(90deg); }
+.b3 > .f-top    { top: 0; left: 0;  width: 100%; height: var(--d); transform: translateY(calc(var(--d) / -2)) rotateX(90deg); }
+.b3 > .f-bottom { bottom: 0; left: 0; width: 100%; height: var(--d); transform: translateY(calc(var(--d) / 2)) rotateX(-90deg); }
+/* The sides catch a little less light than the face, which is most of what
+   sells these as solid rather than as stacked rectangles. */
+.b3 > .f-left, .b3 > .f-right   { filter: brightness(0.72); }
+.b3 > .f-top, .b3 > .f-bottom   { filter: brightness(0.84); }
+.b3 > .f-back                   { filter: brightness(0.6); }
+
+/* --- CORGOS 95: 3.5" floppy --------------------------------------------- */
+.o-floppy { width: 150px; height: 156px; margin: -78px 0 0 -75px; --d: 10px; background: #2b2f37; }
+/* The shutter, label and notch live *inside* the front face, so they sit on
+   its plane. As siblings of the faces they'd be stranded at z=0, in the middle
+   of the box, hidden behind the front. */
+.o-floppy .f-front { background: linear-gradient(150deg, #4b515b 0%, #33373f 55%, #23262c 100%); }
+.floppy-shutter {
+    position: absolute; top: 8px; right: 20px; width: 62px; height: 44px;
+    background: linear-gradient(105deg, #cdd2d9 0%, #9aa1ab 38%, #dfe4ea 55%, #8f959f 100%);
+    border-radius: 1px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+/* The slot cut into the shutter, offset to one side the way a real one is. */
+.floppy-shutter::after {
+    content: ''; position: absolute; left: 8px; top: 6px; width: 20px; height: 32px;
+    background: #14161a; border-radius: 1px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+.floppy-label {
+    position: absolute; left: 12px; right: 12px; bottom: 14px; height: 62px;
+    background: linear-gradient(180deg, #fbfbf6 0%, #e6e6dc 100%);
+    border-radius: 1px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    padding: 13px 8px 0; box-sizing: border-box;
+    text-align: center;
+    font-family: Tahoma, 'MS Sans Serif', Arial, sans-serif;
+    overflow: hidden;
+}
+/* The coloured strip across the top of the sticker. */
+.floppy-label::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 0; height: 7px;
+    background: linear-gradient(90deg, #1c5fb0 0%, #3f8ede 100%);
+}
+.floppy-label-title {
+    font-size: 11px; font-weight: bold; color: #16181d;
+    line-height: 1.15; letter-spacing: -0.2px;
+    white-space: nowrap;
+}
+.floppy-label-sub {
+    font-size: 7.5px; color: #5c5f66; margin-top: 3px;
+    letter-spacing: 0.2px; white-space: nowrap;
+}
+/* Write-protect tab, bottom left of the body. */
+.floppy-notch {
+    position: absolute; left: 9px; top: 12px; width: 13px; height: 13px;
+    background: #101216; border-radius: 1px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+/* --- CORGOS XP / 7: CD and DVD ------------------------------------------ */
+.o-disc { width: 170px; height: 170px; margin: -85px 0 0 -85px; }
+/* Slower than it was: the disc carries a printed label now, and at the old 8s
+   the text swung past too fast to read. */
+.disc-spin { position: absolute; inset: 0; transform-style: preserve-3d; animation: discSpin 18s linear infinite; animation-play-state: paused; }
+.boot-media.selected .disc-spin { animation-play-state: running; }
+@keyframes discSpin { to { transform: rotate(360deg); } }
+
+/* The printed face. Sits inside .disc-face.top, so the hole punched in that
+   face's mask goes through the label too — which is right, the print stops at
+   the hub on a real disc. Inset 9% leaves the thin bare rim a pressed disc
+   has, rather than the wide one it had when the label was a coloured circle
+   floating in the middle. */
+.disc-print {
+    position: absolute; inset: 9%;
+    border-radius: 50%;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    text-align: center;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+    overflow: hidden;
+}
+/* Flag + wordmark sit together above the hub, the way they do on the real
+   thing; the edition goes below it and the small print below that. */
+.disc-print-brand {
+    position: absolute; left: 6%; right: 6%; top: 13%;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+.disc-flag { width: 17px; height: 15.5px; flex-shrink: 0; }
+.disc-print-word { line-height: 1; white-space: nowrap; }
+.disc-word { font-size: 12px; font-weight: 600; letter-spacing: -0.2px; }
+/* XP set its version small, lowercase and orange next to the name. */
+.disc-word-ver { font-size: 11px; font-weight: 700; color: #f0921e; margin-left: 1px; text-transform: lowercase; }
+.disc-print-sub {
+    position: absolute; left: 6%; right: 6%; top: 60%;
+    font-size: 7.5px; letter-spacing: 1.5px; text-transform: uppercase;
+    font-weight: 600; white-space: nowrap;
+}
+.disc-print-fine {
+    position: absolute; left: 10%; right: 10%; bottom: 9%;
+    font-size: 4.6px; letter-spacing: 0.3px; opacity: 0.55; white-space: nowrap;
+}
+
+/* --- XP: a silver disc, which is what it actually was. The old one was a
+   saturated blue circle, and that was the least accurate thing about it —
+   the retail CD is pale metallic with the blue-green wave low on the face. */
+.o-cd .disc-print {
+    background:
+        radial-gradient(ellipse 120% 62% at 50% 118%, #2f7d5e 0%, #2c6ea8 34%, rgba(44,110,168,0) 66%),
+        linear-gradient(168deg, #fdfdfe 0%, #eef1f5 46%, #dfe4ea 74%, #cfd6de 100%);
+    color: #16202b;
+}
+.o-cd .disc-print-sub { color: #2a5d92; }
+.o-cd .pane-a { fill: #e8453c; } .o-cd .pane-b { fill: #6fbf3f; }
+.o-cd .pane-c { fill: #2b8fe0; } .o-cd .pane-d { fill: #f5bd19; }
+
+/* --- 7: near-black with the warm flare it launched with, and a glassier flag. */
+.o-dvd .disc-print {
+    background:
+        radial-gradient(ellipse 78% 62% at 62% 82%, rgba(240,146,30,0.62) 0%, rgba(160,58,96,0.34) 38%, rgba(20,17,44,0) 70%),
+        radial-gradient(circle at 42% 24%, #2b2b46 0%, #17172c 52%, #0b0b16 100%);
+    color: #f3f1fb;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.o-dvd .disc-print-sub { color: #f0c08a; }
+.o-dvd .disc-flag { filter: drop-shadow(0 0 3px rgba(120, 190, 255, 0.75)); }
+.o-dvd .pane-a { fill: #ff6a5e; } .o-dvd .pane-b { fill: #8ede5a; }
+.o-dvd .pane-c { fill: #56b4ff; } .o-dvd .pane-d { fill: #ffd451; }
+
+/* --- 10: signature Windows 10 blue DVD with modern angled logo --- */
+.o-dvd-10 .disc-print {
+    background:
+        radial-gradient(ellipse 95% 70% at 50% 25%, #0078d7 0%, #004e8c 55%, #001f3f 100%);
+    color: #ffffff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+.o-dvd-10 .disc-print-sub { color: #8cd0ff; }
+.o-dvd-10 .disc-flag { width: 17px; height: 17px; filter: drop-shadow(0 0 3px rgba(0, 150, 255, 0.8)); }
+
+.usb-corgpilot-logo {
+    position: absolute;
+    left: 50%;
+    top: 52%;
+    transform: translate(-50%, -50%);
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
+    pointer-events: none;
+}
+
+.disc-face {
+    position: absolute; inset: 0; border-radius: 50%;
+    /* A real hole, so the blue behind shows through the middle. */
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 7.5%, #000 7.5%);
+    mask-image: radial-gradient(circle at 50% 50%, transparent 0 7.5%, #000 7.5%);
+}
+.disc-face.top    { transform: translateZ(1.5px); }
+.disc-face.bottom { transform: translateZ(-1.5px) rotateY(180deg); }
+/* Sheen sits above the data surface and does NOT spin, so the highlight stays
+   put while the disc turns under it — which is what a spinning disc does. */
+.disc-sheen {
+    position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+    background:
+        radial-gradient(ellipse 62% 44% at 32% 24%, rgba(255,255,255,0.55), rgba(255,255,255,0) 60%),
+        radial-gradient(ellipse 50% 34% at 72% 82%, rgba(255,255,255,0.22), rgba(255,255,255,0) 65%);
+    transform: translateZ(2.2px);
+}
+
+/* CD: silver first, rainbow second. A full-strength conic came out as a pastel
+   pinwheel — a real CD is a mirror that happens to throw colour, so the silver
+   wash goes over the spectrum and knocks it back. Layer order is topmost first. */
+.o-cd .disc-face.top {
+    background:
+        radial-gradient(circle at 50% 50%, #cfd6df 0 13%, rgba(207,214,223,0) 13.6%),
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 0 16%, rgba(232,236,241,0.62) 34%, rgba(255,255,255,0.30) 70%, rgba(190,197,206,0.55) 100%),
+        repeating-conic-gradient(from 0deg, rgba(255,255,255,0.12) 0deg 1.6deg, rgba(0,0,0,0.12) 1.6deg 3.2deg),
+        conic-gradient(from 205deg, #35c9f0, #7b74e8, #f062b8, #f0b640, #3fd694, #35c9f0);
+}
+.o-cd .disc-face.bottom {
+    background: radial-gradient(circle at 50% 50%, #d7dbe1 0 13%, #eef0f3 13.6% 96%, #c9ced6 100%);
+}
+/* DVD: darker, violet-shifted, with the dual-layer boundary showing. */
+.o-dvd .disc-face.top {
+    background:
+        radial-gradient(circle at 50% 50%, #b9bfc9 0 13%, rgba(185,191,201,0) 13.6%),
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.16) 0 57%, rgba(0,0,0,0.18) 57.6%),
+        repeating-conic-gradient(from 0deg, rgba(255,255,255,0.07) 0deg 1.2deg, rgba(0,0,0,0.16) 1.2deg 2.4deg),
+        conic-gradient(from 160deg, #4d3f8f, #7b4bb5, #b555a8, #d16fa0, #6d4bd0, #3f4fa8, #4d3f8f);
+}
+.o-dvd .disc-face.bottom {
+    background: radial-gradient(circle at 50% 50%, #c6cad1 0 13%, #2a2340 13.6% 96%, #191430 100%);
+}
+
+/* --- CORGOS 11: USB stick ----------------------------------------------- */
+.o-usb { width: 68px; height: 164px; margin: -82px 0 0 -34px; }
+.usb-plug {
+    top: 0; left: 12px; width: 44px; height: 50px; --d: 10px;
+    background: linear-gradient(100deg, #d7dbe1 0%, #a9b0ba 45%, #e6e9ee 60%, #98a0ab 100%);
+}
+.usb-plug .f-front::after {
+    content: ''; position: absolute; left: 6px; right: 6px; top: 10px; bottom: 8px;
+    background: #1b1e24; border-radius: 1px;
+    box-shadow: inset 0 0 0 2px #6f7681;
+}
+.usb-body {
+    top: 44px; left: 0; width: 68px; height: 120px; --d: 18px;
+    background: linear-gradient(105deg, #fdfdfe 0%, #eceef1 45%, #ffffff 58%, #dfe3e8 100%);
+    border-radius: 3px;
+}
+/* Win11's accent stripe, plus the seam and the activity LED. */
+.usb-body .f-front::before {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 34px;
+    background: linear-gradient(180deg, #2f8ce0 0%, #0067c0 100%);
+    border-radius: 0 0 3px 3px;
+}
+.usb-body .f-front::after {
+    content: ''; position: absolute; left: 26px; top: 14px; width: 16px; height: 4px;
+    background: #c3c8ce; border-radius: 2px;
+}
+.usb-led {
+    position: absolute; left: 50%; margin-left: -3px; top: 60px; width: 6px; height: 6px;
+    border-radius: 50%; background: #6ee7a8;
+    box-shadow: 0 0 6px 2px rgba(110, 231, 168, 0.75);
+    transform: translateZ(10px);
+    opacity: 0.25;
+}
+.boot-media.selected .usb-led { animation: usbBlink 1.6s ease-in-out infinite; }
+@keyframes usbBlink { 0%, 100% { opacity: 0.2; } 45% { opacity: 1; } }
+
+/* Motion here is decoration, not information — the capsule still widens so you
+   can see which one is selected, but the idle float and the spin stop. */
+@media (prefers-reduced-motion: reduce) {
+    .boot-media.selected .boot-obj,
+    .boot-media.selected .disc-spin,
+    .boot-media.selected .usb-led { animation: none; }
+}
+
+
+body {
+    background-color: var(--win-teal);
+    color: var(--win-black);
+    font-family: Tahoma, 'MS Sans Serif', Arial, sans-serif;
+    overflow: hidden; 
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    height: 100vh;
+    height: 100dvh; 
+    display: flex;
+    flex-direction: column;
+    touch-action: manipulation;
+}
+
+.win98-window {
+    background-color: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-white) var(--win-black) var(--win-black) var(--win-white);
+    box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; 
+    margin: 0;
+    min-height: 0; 
+}
+
+.win98-titlebar {
+    background-color: var(--win-blue); 
+    color: var(--win-light);
+    padding: 3px 5px;
+    font-weight: bold;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.game-area .win98-titlebar, .shop-area .win98-titlebar, .welcome-window .win98-titlebar {
+    color: var(--win-white);
+}
+
+.win98-content {
+    padding: 15px;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.win98-button {
+    background-color: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-white) var(--win-black) var(--win-black) var(--win-white);
+    box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray);
+    color: var(--win-black);
+    font-family: Tahoma, 'MS Sans Serif', Arial, sans-serif;
+    cursor: pointer;
+    text-align: center;
+    padding: 4px;
+    box-sizing: border-box;
+}
+
+.win98-button:active:not(:disabled) {
+    border-color: var(--win-black) var(--win-white) var(--win-white) var(--win-black);
+    box-shadow: inset 1px 1px var(--win-dark-gray), inset -1px -1px var(--win-light);
+    padding: 5px 3px 3px 5px; 
+}
+
+.win98-button:disabled {
+    color: var(--win-dark-gray);
+    text-shadow: 1px 1px var(--win-white);
+    cursor: not-allowed;
+}
+/* An upgrade you can't afford is disabled (see updateUI), and the whole button
+   has to read that way — the name and the cost line carry their own colours
+   (.consumable-btn/.limit-btn paint them red and navy), so greying only the
+   button leaves a bright red heading on a dead control. */
+.win98-button:disabled .upgrade-name,
+.win98-button:disabled .upgrade-desc,
+.win98-button:disabled .cost-text {
+    color: var(--win-dark-gray) !important;
+}
+
+/* Each theme repaints .win98-button with `color: ... !important`, which beat
+   the :disabled rule above and left unaffordable Black Market buttons looking
+   exactly like affordable ones on XP, 7 and 11 — win95 was the only theme
+   greying them out. These restate the disabled look in each theme's idiom, at
+   higher specificity and with !important so they actually land.
+
+   The background half skips the .glow-* buttons on purpose, so every theme
+   behaves the way win95 already did: a glowing post-game upgrade you can't
+   afford keeps its glow and its colour, and it's the greyed text that tells
+   you it's out of reach. */
+body.winxp-theme .win98-button:disabled,
+body.winxp-theme .win98-button:disabled .upgrade-name,
+body.winxp-theme .win98-button:disabled .upgrade-desc,
+body.winxp-theme .win98-button:disabled .cost-text {
+    color: #9a9a94 !important;
+    text-shadow: 1px 1px #fff !important;
+}
+body.winxp-theme .win98-button:disabled:not([class*="glow-"]) {
+    background: linear-gradient(180deg, #fbfbf8 0%, #f0f0ea 45%, #e6e6de 50%, #f4f4ee 100%) !important;
+    border-color: #b6b6ac !important;
+    box-shadow: inset 0 0 0 1px #fff !important;
+}
+
+body.win7-theme .win98-button:disabled,
+body.win7-theme .win98-button:disabled .upgrade-name,
+body.win7-theme .win98-button:disabled .upgrade-desc,
+body.win7-theme .win98-button:disabled .cost-text {
+    color: #9aa3aa !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+}
+body.win7-theme .win98-button:disabled:not([class*="glow-"]) {
+    background: linear-gradient(180deg, #f7f9fb 0%, #eef2f6 45%, #e6ebf0 50%, #f4f7fa 100%) !important;
+    border-color: #c5cfd8 !important;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7) !important;
+}
+
+body.win11-theme .win98-button:disabled,
+body.win11-theme .win98-button:disabled .upgrade-name,
+body.win11-theme .win98-button:disabled .upgrade-desc,
+body.win11-theme .win98-button:disabled .cost-text {
+    color: #a4a4a4 !important;
+    text-shadow: none !important;
+}
+body.win11-theme .win98-button:disabled:not([class*="glow-"]) {
+    background: rgba(249, 249, 249, 0.6) !important;
+    border-color: rgba(0, 0, 0, 0.06) !important;
+    box-shadow: none !important;
+}
+/* 11 has no not-allowed cursor rule of its own (the theme leaves the system
+   cursor alone), so the base .win98-button:disabled cursor is what applies. */
+
+.win98-input {
+    width: 45px;
+    padding: 2px 4px;
+    font-family: Tahoma, 'MS Sans Serif', Arial, sans-serif;
+    font-size: 11px;
+    background-color: var(--win-white);
+    color: var(--win-black);
+    border: 2px solid;
+    border-color: var(--win-dark-gray) var(--win-white) var(--win-white) var(--win-black);
+    box-shadow: inset 1px 1px var(--win-black), inset -1px -1px var(--win-light);
+    outline: none;
+}
+
+.close-btn {
+    font-weight: bold;
+    padding: 0;
+    margin-left: 10px;
+    font-size: 14px;
+    height: 16px; 
+    width: 16px;
+    line-height: 14px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Achievements.exe. This block is the CORGOS 95 look — raised grey rows on a
+   dark grey panel; the three theme blocks further down re-dress the same
+   markup for XP, 7 and 11. */
+.achievements-body {
+    background: var(--win-dark-gray);
+    padding: 10px;
+}
+.achievements-heading {
+    margin-top: 0;
+    text-align: center;
+    text-shadow: 1px 1px 0 #000;
+}
+#achievements-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    max-height: 50vh;
+    padding-right: 5px;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    background-color: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-white) var(--win-black) var(--win-black) var(--win-white);
+    box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray);
+}
+
+.achievement-locked {
+    filter: grayscale(100%);
+    opacity: 0.5;
+}
+
+.achievement-text {
+    flex-grow: 1;
+    text-align: left;
+}
+.achievement-text strong {
+    display: block;
+    font-size: 14px;
+    color: var(--win-blue);
+    margin-bottom: 2px;
+}
+.achievement-text span {
+    font-size: 11px;
+}
+
+#toast-container {
+    position: fixed;
+    bottom: 40px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: none;
+}
+.toast-notification {
+    background-color: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-white) var(--win-black) var(--win-black) var(--win-white);
+    box-shadow: 4px 4px 10px rgba(0,0,0,0.5);
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 250px;
+    animation: slideInUp 0.4s ease-out forwards;
+    pointer-events: auto;
+}
+.toast-notification.fade-out {
+    animation: fadeOutRight 0.5s ease-in forwards;
+}
+
+@keyframes slideInUp {
+    from { transform: translateY(150%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeOutRight {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(150%); opacity: 0; }
+}
+
+::-webkit-scrollbar { width: 16px; height: 16px; background: var(--win-light); }
+::-webkit-scrollbar-track { background-color: var(--win-light); }
+::-webkit-scrollbar-corner { background-color: var(--win-gray); }
+::-webkit-scrollbar-thumb { background-color: var(--win-gray); border-top: 2px solid var(--win-white); border-left: 2px solid var(--win-white); border-bottom: 2px solid var(--win-black); border-right: 2px solid var(--win-black); box-shadow: inset -1px -1px var(--win-dark-gray), inset 1px 1px var(--win-light); }
+::-webkit-scrollbar-button { background-color: var(--win-gray); border-top: 2px solid var(--win-white); border-left: 2px solid var(--win-white); border-bottom: 2px solid var(--win-black); border-right: 2px solid var(--win-black); box-shadow: inset -1px -1px var(--win-dark-gray), inset 1px 1px var(--win-light); display: block; background-position: center; background-repeat: no-repeat; }
+::-webkit-scrollbar-button:active { border-top: 2px solid var(--win-black); border-left: 2px solid var(--win-black); border-bottom: 2px solid var(--win-white); border-right: 2px solid var(--win-white); box-shadow: inset 1px 1px var(--win-dark-gray), inset -1px -1px var(--win-light); background-position: calc(50% + 1px) calc(50% + 1px); }
+::-webkit-scrollbar-button:vertical:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 10l4-5 4 5z' fill='black'/%3E%3C/svg%3E"); }
+::-webkit-scrollbar-button:vertical:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 5 4-5z' fill='black'/%3E%3C/svg%3E"); }
+::-webkit-scrollbar-button:horizontal:decrement { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M10 4l-5 4 5 4z' fill='black'/%3E%3C/svg%3E"); }
+::-webkit-scrollbar-button:horizontal:increment { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M6 4l5 4-5 4z' fill='black'/%3E%3C/svg%3E"); }
+
+input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+input[type=range]:focus { outline: none; }
+input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: var(--win-dark-gray); border-bottom: 1px solid var(--win-white); border-right: 1px solid var(--win-white); border-top: 1px solid var(--win-black); border-left: 1px solid var(--win-black); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 12px; background-color: var(--win-gray); border: 2px solid; border-color: var(--win-white) var(--win-black) var(--win-black) var(--win-white); box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray); cursor: pointer; margin-top: -10px; }
+input[type=range]::-moz-range-track { width: 100%; height: 4px; cursor: pointer; background: var(--win-dark-gray); border-bottom: 1px solid var(--win-white); border-right: 1px solid var(--win-white); border-top: 1px solid var(--win-black); border-left: 1px solid var(--win-black); }
+input[type=range]::-moz-range-thumb { height: 20px; width: 12px; background-color: var(--win-gray); border: 2px solid; border-color: var(--win-white) var(--win-black) var(--win-black) var(--win-white); box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray); cursor: pointer; border-radius: 0; }
+
+/* Icons flow down the left edge and, when they run out of room, into a second
+   column — which is what Windows does and what this needed once XP's extra
+   three apps and the two new games pushed the column through the taskbar.
+   `bottom` (rather than a height) is what gives the container a definite size
+   for wrapping to work against, and it tracks --taskbar-height so each theme's
+   taskbar is cleared by its own amount. */
+#desktop-icons {
+    position: fixed;
+    top: 20px; left: 20px;
+    bottom: calc(var(--taskbar-height) + 14px);
+    z-index: 1;
+    display: flex; flex-flow: column wrap;
+    align-content: flex-start;
+    gap: 18px 14px;
+    pointer-events: auto;
+}
+.desktop-icon { display: flex; flex-direction: column; align-items: center; width: 72px; cursor: pointer; -webkit-user-drag: none; user-select: none; }
+.desktop-icon > img { width: 32px; height: 32px; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.6)); -webkit-user-drag: none; }
+.desktop-icon span { margin-top: 4px; font-size: 11px; text-align: center; color: var(--win-white); font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; padding: 1px 3px; }
+.desktop-icon:hover span { background-color: var(--win-blue); }
+/* Every bin picture is a big smooth render, not pixel art, and each theme
+   brings its own (see OS_THEMES.trashIcon). Nearest-neighbour on a 1000px
+   source squeezed into a 32px icon is a mess of stray pixels, so these
+   downscale smoothly while the genuinely chunky icons around them stay
+   pixelated. */
+.trash-icon { image-rendering: auto !important; }
+
+@media screen and (max-width: 800px) {
+    #desktop-icons { display: none; }
+}
+
+/* Flex items always form their own stacking context (even at z-index:auto),
+   so nested z-index on .game-area/#shop-overlay-wrapper can't out-rank a
+   root-level sibling like #desktop-icons — the whole wrapper subtree paints
+   as one unit at whatever level the wrapper itself sits. Give the wrapper a
+   z-index above #desktop-icons so real windows inside it properly cover
+   icons, and make the wrapper pointer-events:none so its own empty
+   padding/gaps don't block icon clicks; the actual window panels opt back
+   into pointer-events so they still capture clicks where visible. */
+#main-content-wrapper { flex: 1; display: flex; align-items: stretch; gap: 20px; padding: 20px; height: auto; box-sizing: border-box; z-index: 2; min-height: 0; pointer-events: none; }
+.game-area { flex: 2; position: relative; box-sizing: border-box; pointer-events: auto; }
+#game-content-inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.shop-area { flex: 1; min-width: 300px; }
+
+/* Docked windows (CORG_Clicker, Black_Market_Shop): laid out in the flex row
+   until you drag them by the titlebar, at which point undockWindow() in main.js
+   swaps them onto position:fixed and drops a placeholder into their slot. See
+   the comment above that function — everything here is the other half of it. */
+.dockable-window { position: relative; }
+.dockable-window > .win98-titlebar { cursor: move; }
+.window-undocked {
+    position: fixed !important;
+    margin: 0 !important;
+    flex: none !important;
+    max-width: none !important;
+    max-height: none !important;
+    pointer-events: auto;
+    box-shadow: 4px 4px 14px rgba(0, 0, 0, 0.45);
+}
+/* Holds the slot open so the other column doesn't jump when this one leaves.
+   undockWindow() copies the window's own `flex` onto it inline, and
+   min-width:0 is what lets it give the room back when the sibling column
+   reappears. */
+.window-dock-placeholder { flex: 0 0 auto; min-width: 0; visibility: hidden; pointer-events: none; }
+#shop-overlay-wrapper.has-undocked-window { pointer-events: none; }
+
+.score-container { font-size: 18px; margin: 10px 0; padding: 5px; background: var(--win-white); border: 2px solid; border-color: var(--win-dark-gray) var(--win-light) var(--win-light) var(--win-dark-gray); box-shadow: inset 1px 1px var(--win-black); display: inline-block; width: 80%; }
+.stats-text { font-size: 12px; margin-bottom: 20px; }
+
+#gug-can { image-rendering: pixelated; width: clamp(150px, min(40vh, 40vw), 250px) !important; height: auto !important; object-fit: contain; cursor: pointer; transition: transform 0.05s; -webkit-user-drag: none; user-select: none; }
+#gug-can:active { transform: scale(0.95); }
+
+.upgrade-btn { width: 100%; margin-bottom: 10px; text-align: left; padding: 8px; }
+.upgrade-name { font-weight: bold; font-size: 14px; }
+.upgrade-desc { font-size: 11px; margin-top: 4px; }
+.consumable-btn .upgrade-name { color: #d00000; }
+.limit-btn .upgrade-name { color: #000080; }
+
+.popup-ad { position: absolute; width: 300px; z-index: 100; animation: popIn 0.1s ease-out; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); }
+.popup-ad .win98-titlebar { cursor: move; }
+/* An ad Corg has body-checked (see kickAd): the sim owns its transform from
+   then on, so the theme pop-in animations have to stay off it. */
+.popup-ad.ad-physics { animation: none !important; will-change: transform; }
+/* The debris left by shatterAd(): a dead ad's own layout box, filled with
+   clip-path wedges of a copy of it. Nothing in here is real — the ad itself is
+   already removed from the DOM — so it must never take a click, and it sits
+   above the ad layer so shards fall in front of the ads still standing. */
+.ad-shatter {
+    position: absolute;
+    z-index: 400;
+    pointer-events: none;
+    overflow: visible;
+}
+.ad-shard {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    will-change: transform, opacity;
+    /* The clip-path polygon itself is set inline per shard: each one renders
+       the whole ad and shows one wedge of it, so the artwork stays continuous
+       across the break. */
+}
+/* The ad copy inside a shard. Deliberately not .popup-ad — see buildAdShardFace
+   — so this has to re-state the few .popup-ad looks that aren't set inline. */
+.ad-shard-face { box-shadow: none; animation: none !important; }
+.ad-shard-face .win98-titlebar { cursor: default; }
+/* Stands in for an iframe/video in a shard: cloning a live YouTube embed 22
+   times would restart the ad mid-break. */
+.ad-shard-filler { width: 100%; background: #101010; }
+
+.popup-content img { max-width: 100%; height: auto; margin-bottom: 10px; border: 1px solid var(--win-dark-gray); -webkit-user-drag: none;}
+.popup-content a { color: blue; text-decoration: underline; cursor: pointer; }
+
+/* App windows float over the desktop instead of dimming it: the overlay itself
+   is transparent and click-through, only the window inside it takes clicks.
+   Add `modal-dim` to the ones that really are modal (shutdown-flow screens,
+   lightboxes) to get the old darkened backdrop back. */
+.screen-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: transparent; pointer-events: none; z-index: 9999; justify-content: center; align-items: center; }
+.screen-overlay > * { pointer-events: auto; }
+.screen-overlay.modal-dim { background: rgba(0,0,0,0.7); pointer-events: auto; }
+
+.movable-resizable { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); resize: both; overflow: auto; min-width: 220px; min-height: 120px; }
+.movable-resizable .win98-titlebar { cursor: move; }
+
+/* Windows whose content is an <iframe> can't use the native CSS resizer — the
+   iframe swallows the pointer over the bottom-right corner — so they get an
+   explicit grip on top of it instead. `window-interacting` kills iframe
+   pointer events for the duration so drags/resizes don't get eaten either. */
+.movable-resizable.has-resize-grip { resize: none; }
+.window-resize-grip {
+    position: absolute; right: 0; bottom: 0; width: 18px; height: 18px;
+    z-index: 20; cursor: nwse-resize; touch-action: none;
+    background:
+        linear-gradient(135deg, transparent 46%, rgba(255,255,255,0.75) 46%, rgba(255,255,255,0.75) 54%, transparent 54%),
+        linear-gradient(135deg, transparent 60%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.55) 68%, transparent 68%),
+        linear-gradient(135deg, transparent 74%, rgba(0,0,0,0.55) 74%, rgba(0,0,0,0.55) 82%, transparent 82%);
+}
+body.window-interacting iframe { pointer-events: none; }
+body.window-interacting { user-select: none; }
+.game-over-window { width: 400px; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); }
+.game-over-content { text-align: center; padding: 20px; }
+.game-over-content h2 { margin-top: 0; color: var(--win-blue); }
+.stats-block { text-align: left; background: var(--win-white); border: 2px solid; border-color: var(--win-dark-gray) var(--win-light) var(--win-light) var(--win-dark-gray); box-shadow: inset 1px 1px var(--win-black); padding: 10px; margin-bottom: 20px; }
+
+.welcome-window { width: 450px; animation: popIn 0.3s ease-out; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); }
+.welcome-content { text-align: center; font-size: 12px; padding: 20px; }
+.welcome-content h1 { font-size: 18px; margin-top: 0; color: var(--win-blue); }
+.setup-icon { margin-bottom: 15px; width: 48px; height: 48px; }
+.divider { height: 2px; border-top: 1px solid var(--win-dark-gray); border-bottom: 1px solid var(--win-white); margin: 15px 0; }
+
+.guggy-container { position: fixed; bottom: calc(var(--taskbar-height) + 20px); left: 40px; z-index: 500; display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+.guggy-bubble { position: absolute; bottom: 100%; left: 10px; width: 210px; background-color: #ffffe1; border: 1px solid #000000; padding: clamp(6px, 1.5vh, 10px); font-family: Tahoma, 'MS Sans Serif', Arial, sans-serif; font-size: clamp(11px, 2.5vh, 14px); color: #000000; box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.3); border-radius: 3px; line-height: 1.3; z-index: 9999; margin-bottom: 10px; }
+.guggy-icon-group { display: flex; flex-direction: column; align-items: center; cursor: grab; cursor: move; pointer-events: auto; padding: 2px; position: relative; z-index: 1; }
+.guggy-container.dragging .guggy-icon-group { cursor: grabbing; }
+/* image-rendering used to be `pixelated` for the old pixel-art gifs; corg is a
+   photo, so let the browser smooth it when it scales down. */
+/* Every Corg's picture, not just the original's — clones carry .corg-img but
+   no id, and when these rules were id-scoped a clone rendered at the image's
+   full natural size and, worse, kept the browser's native image dragging,
+   which swallows the mouseup that ends our drag and leaves it glued to the
+   cursor. */
+.corg-img { width: clamp(75px, min(16vh, 25vw), 130px) !important; height: auto !important; filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.4)); transition: transform 0.05s ease; image-rendering: auto; user-select: none; -webkit-user-drag: none; }
+.guggy-icon-group:active .corg-img { transform: translateY(2px); }
+/* Let go of Corg and they fly (launchGuggy): tumbling through the air,
+   squashing flat and saying "corg" on every bounce. */
+.guggy-container.falling .corg-img { animation: corg-tumble 0.55s ease-in-out infinite; }
+@keyframes corg-tumble {
+    0%, 100% { transform: rotate(-11deg); }
+    50% { transform: rotate(11deg); }
+}
+/* Squash from the feet up, not the middle, so Corg pancakes onto the floor.
+   Scoped through .guggy-container so it outweighs the tumble above and takes
+   over the transform for the length of each impact. */
+.guggy-container .corg-img.squash { animation: corg-squash 0.32s ease-out; transform-origin: bottom center; }
+/* --squash (0-1) is set by squashGuggy() from the impact speed, so the whole
+   deformation scales with how hard Corg actually landed. */
+@keyframes corg-squash {
+    0% { transform: scale(calc(1 + 0.32 * var(--squash, 1)), calc(1 - 0.38 * var(--squash, 1))) translateY(calc(9px * var(--squash, 1))); }
+    45% { transform: scale(calc(1 - 0.12 * var(--squash, 1)), calc(1 + 0.14 * var(--squash, 1))) translateY(calc(-5px * var(--squash, 1))); }
+    75% { transform: scale(calc(1 + 0.05 * var(--squash, 1)), calc(1 - 0.05 * var(--squash, 1))) translateY(calc(1px * var(--squash, 1))); }
+    100% { transform: scale(1, 1); }
+}
+/* The word "corg", wherever the game says it, is the dog rather than four
+   letters. corgifyTextNodes() in main.js drops one of these in place of every
+   occurrence in every text node on the page, so it lands inside headings,
+   taskbar buttons, desktop labels, the shop, ad bodies, boot splashes — any
+   container at all.
+
+   Hence the !important on every line: a dozen containers style their own
+   descendant images (.desktop-icon img, .popup-content img, .task-btn img,
+   .win95-program-item img, .mine-cell img, .setup-logo img ... all of which
+   beat a bare class on specificity), and a word that renders at 32x32 with a
+   border inside one container and correctly in the next is worse than none of
+   this. The size is in `em` so it tracks whatever type it's sitting in — small
+   in an 11px taskbar label, larger in a heading — without any caller passing a
+   pixel value. */
+img.corg-word {
+    display: inline-block !important;
+    height: 1.35em !important;
+    width: auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    vertical-align: -0.34em !important;
+    object-fit: contain !important;
+    image-rendering: auto !important;
+    -webkit-user-drag: none;
+    user-select: none;
+    pointer-events: none;
+}
+/* For a line that is *only* the word, rather than a word inside a sentence. */
+img.corg-word.corg-word-block {
+    display: block !important;
+    margin: 2px auto !important;
+    height: clamp(46px, 9vh, 72px) !important;
+    vertical-align: baseline !important;
+}
+/* Under a desktop icon, where the label is small but the picture shouldn't be. */
+img.corg-word.corg-word-label {
+    display: block !important;
+    margin: 0 auto !important;
+    height: clamp(20px, 3.4vh, 28px) !important;
+    vertical-align: baseline !important;
+}
+.guggy-buttons { display: flex; justify-content: center; gap: 15px; margin-top: 12px; margin-bottom: 4px; }
+.guggy-btn { background-color: #ffffe1; border: 1px solid #000000; border-radius: 4px; padding: 3px 20px; font-family: Tahoma, 'MS Sans Serif', Arial, sans-serif; font-size: 11px; color: #000000; cursor: pointer; box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.2); pointer-events: auto; }
+.guggy-btn:active { box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.3); transform: translateY(1px); }
+.guggy-bubble-tail { position: absolute; bottom: -7px; left: 35px; width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 7px solid #ffffe1; }
+.win98-desktop-label { margin-top: 5px; font-size: clamp(12px, 2.5vh, 16px); color: var(--win-white); text-align: center; font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; padding: 1px 3px; border: 1px dotted transparent; user-select: none; position: relative; z-index: 2; }
+
+#trashcan { position: absolute; bottom: 20px; right: 20px; width: auto; height: auto; z-index: 10; display: flex; flex-direction: column; align-items: center; -webkit-user-drag: none; user-select: none; }
+#trashcan img { width: clamp(70px, min(30vh, 50vw), 160px) !important; height: auto !important; image-rendering: pixelated; -webkit-user-drag: none; user-select: none; }
+.trashcan-label { margin-top: 5px; font-size: clamp(12px, 2.5vh, 16px); color: var(--win-white); text-align: center; font-weight: bold; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000; position: relative; z-index: 2; }
+
+/* Corg-proof forcefield. Every bin (desktop and CORG_Clicker) wears an
+   invisible orb that only Corg can feel: drag them into it and it flares, hums
+   and shoves them back out. Ads pass straight through it as always. */
+.trash-forcefield {
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    background: radial-gradient(circle, rgba(120, 220, 255, 0.04) 0%, rgba(120, 220, 255, 0.16) 58%, rgba(180, 245, 255, 0.5) 84%, rgba(200, 250, 255, 0) 100%);
+    box-shadow: 0 0 28px rgba(120, 220, 255, 0.65), inset 0 0 34px rgba(120, 220, 255, 0.55);
+}
+.trash-forcefield.active { opacity: 1; animation: forcefield-pulse 0.4s ease-in-out infinite; }
+@keyframes forcefield-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.045); }
+}
+
+/* Right-click menu on a Corg. Plain Win95 menu chrome — it sits above the
+   taskbar so a Corg parked down there still gets a usable menu. */
+.corg-context-menu {
+    position: fixed;
+    display: none;
+    z-index: 10050;
+    min-width: 168px;
+    padding: 2px;
+    background-color: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-white) var(--win-black) var(--win-black) var(--win-white);
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+    font-family: 'MS Sans Serif', Tahoma, sans-serif;
+    font-size: 12px;
+    color: var(--win-black);
+    user-select: none;
+}
+.corg-menu-item { padding: 4px 18px 4px 10px; cursor: pointer; }
+.corg-menu-item:hover { background-color: var(--win-blue); color: var(--win-white); }
+.corg-menu-item.disabled { color: var(--win-dark-gray); text-shadow: 1px 1px 0 var(--win-white); cursor: default; }
+.corg-menu-item.disabled:hover { background-color: transparent; color: var(--win-dark-gray); }
+.corg-menu-sep { height: 2px; margin: 3px 2px; border-top: 1px solid var(--win-dark-gray); border-bottom: 1px solid var(--win-white); }
+
+/* Screensaver: the DVD-logo idle, with a Corg. Covers everything including the
+   taskbar, because that's what a screensaver does. */
+.corg-screensaver {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 20000;
+    background: #000;
+    overflow: hidden;
+    cursor: none;
+}
+.screensaver-corg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: clamp(110px, 16vw, 220px);
+    text-align: center;
+    will-change: transform, filter;
+    transition: filter 0.15s linear;
+}
+.screensaver-corg img { width: 100%; height: auto; display: block; -webkit-user-drag: none; }
+.screensaver-label {
+    margin-top: 6px;
+    font-family: 'VCR OSD Mono', 'MS Sans Serif', monospace;
+    font-size: clamp(14px, 2vw, 22px);
+    letter-spacing: 3px;
+    color: var(--win-white);
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+/* The corner hit. Rare, so it gets to be loud. */
+.screensaver-corg.corner-hit { animation: screensaver-corner 0.7s ease-out; }
+@keyframes screensaver-corner {
+    0%, 100% { scale: 1; }
+    30% { scale: 1.35; }
+    60% { scale: 0.92; }
+}
+
+#win95-taskbar { height: var(--taskbar-height); background-color: var(--win-gray); border-top: 2px solid var(--win-white); box-shadow: inset 0 1px var(--win-light); display: flex; align-items: center; padding: 2px; box-sizing: border-box; z-index: 10000; position: relative; }
+#start-button { display: flex; align-items: center; gap: 4px; font-weight: bold; font-size: 13px; padding: 1px 6px 1px 4px; }
+.taskbar-divider { width: 2px; height: 18px; border-left: 1px solid var(--win-dark-gray); border-right: 1px solid var(--win-white); margin: 0 4px; }
+#system-tray { margin-left: auto; height: 20px; border: 2px inset; border-color: var(--win-dark-gray) var(--win-white) var(--win-white) var(--win-dark-gray); display: flex; align-items: center; padding: 0 6px; gap: 6px; font-size: 11px; }
+#tray-clock { min-width: 50px; text-align: right; }
+
+.glow-unforeseen { background-color: #ffcc80 !important; animation: pulse-orange 2s infinite alternate; color: #660000; }
+.glow-post-1 { background-color: #b3ffff !important; animation: pulse-cyan 2s infinite alternate; }
+.glow-post-2 { background-color: #b3ffb3 !important; animation: pulse-green 1.2s infinite alternate; }
+.glow-post-3 { background-color: #d9b3ff !important; animation: pulse-purple 0.8s infinite alternate; color: #2b0057; }
+.glow-post-4 { background-color: #ffe680 !important; animation: pulse-gold 0.3s infinite alternate; font-weight: bold; }
+
+@keyframes pulse-orange { from { box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), 0 0 4px #ff6600; } to { box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), 0 0 14px #ff6600; } }
+@keyframes pulse-cyan { from { box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), 0 0 4px #00ffff; } to { box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), 0 0 12px #00ffff; } }
+@keyframes pulse-green { from { box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), 0 0 8px #39ff14; } to { box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), 0 0 20px #39ff14; } }
+@keyframes pulse-purple { from { box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), 0 0 12px #9d00ff; } to { box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), 0 0 25px #9d00ff; } }
+@keyframes pulse-gold { from { box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), inset 0 0 5px #ffd700, 0 0 15px #ffd700; border-color: #aa8c00; } to { box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), inset 0 0 15px #ffd700, 0 0 35px #ffd700; border-color: #ffe600; } }
+
+.win98-tabs { display: flex; justify-content: center; padding: 6px 4px 0 4px; background-color: var(--win-gray); gap: 2px; border-left: 2px solid var(--win-white); border-right: 2px solid var(--win-black); }
+.win98-tab { background-color: var(--win-gray); border-top: 2px solid var(--win-white); border-left: 2px solid var(--win-white); border-right: 2px solid var(--win-black); border-bottom: none; border-top-left-radius: 3px; border-top-right-radius: 3px; padding: 4px 16px; font-family: Tahoma, 'MS Sans Serif', Arial, sans-serif; font-size: 11px; cursor: pointer; color: var(--win-black); margin-top: 3px; z-index: 1; box-shadow: inset -1px 0 0 var(--win-dark-gray); }
+.win98-tab.active { margin-top: 0; padding-bottom: 6px; margin-bottom: -2px; z-index: 3; font-weight: bold; }
+.tab-content { border-top: 2px solid var(--win-white); }
+
+
+
+
+
+
+#open-shop-btn { display: inline-block; font-weight: bold; padding: 10px 20px; font-size: 16px; margin-bottom: 20px; color: #000000; width: 80%; max-width: 300px; }
+.shop-close-btn { display: flex; }
+#shop-overlay-wrapper { flex: 1; min-width: 300px; display: flex; flex-direction: column; min-height: 0; pointer-events: auto; }
+#shop-overlay-wrapper .shop-area { flex: 1; min-height: 0; max-width: none; height: auto; }
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.text-blue { color: var(--win-blue); }
+.text-danger { color: maroon; }
+.text-bold { font-weight: bold; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.flex-center { display: flex; justify-content: center; align-items: center; }
+.flex-wrap-center { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+.full-width { width: 100%; }
+.mt-0 { margin-top: 0; }
+.mt-15 { margin-top: 15px; }
+.pad-btn { padding: 10px 20px; }
+.begin-btn { padding: 5px 15px; font-weight: bold; }
+.btn-danger { color: maroon; padding: 6px; }
+
+.dev-console-wrapper { margin-top: 8px; border-style: solid; border-width: 1px; border-color: #889180 #282e22 #282e22 #889180; }
+.dev-console-log { height: 90px; margin: 0 !important; font-size: 11px; }
+.dev-console-inputrow { margin: 6px !important; }
+
+.gugexplorer-toolbar { display: flex; align-items: center; gap: 6px; padding: 6px; background: var(--win-gray); border-bottom: 2px solid; border-color: var(--win-dark-gray) var(--win-white) var(--win-white) var(--win-dark-gray); box-sizing: border-box; }
+.gugexplorer-url-input { flex: 1; width: auto; }
+
+/* Developer console. The olive/khaki panel is all that's left of the old
+   storefront skin — it was the only part of it worth keeping, and a console
+   is the one place it still reads as a console rather than as a shop. */
+.corg-console-body {
+    flex: 1; min-height: 0; margin: 6px; padding: 6px; overflow-y: auto;
+    background-color: #3e4637; color: #dedfd6;
+    border-style: solid; border-width: 1px; border-color: #282e22 #889180 #889180 #282e22;
+}
+.corg-console-log { font-family: 'Courier New', monospace; font-size: 12px; white-space: pre-wrap; line-height: 1.6; }
+.corg-console-log a { color: #c6b652; text-decoration: none; }
+.corg-console-log a:hover { background: #3e4637; }
+.corg-console-inputrow { display: flex; gap: 6px; margin: 0 6px 6px; flex-shrink: 0; }
+.corg-console-input {
+    flex: 1; font-family: 'Courier New', monospace; font-size: 12px; padding: 3px 4px;
+    background: #4c5844; color: #a0aa95;
+    border-style: solid; border-width: 1px; border-color: #282e22 #889180 #889180 #282e22;
+}
+.corg-console-input:focus { outline: none; }
+.corg-console-submit {
+    background-color: #4c5844; color: #fff; font-size: 12px; padding: 3px 12px; cursor: pointer;
+    border-style: outset; border-width: 1px; border-color: #889180 #282e22 #282e22 #889180;
+}
+.corg-console-submit:active { border-style: inset; border-color: #282e22 #889180 #889180 #282e22; }
+
+.corg-console-body::-webkit-scrollbar { background-color: #5a6a50; width: 16px; }
+.corg-console-body::-webkit-scrollbar-thumb {
+    background-color: #4c5844; border-style: outset; border-width: 1px; border-color: #889180 #282e22 #282e22 #889180;
+}
+.corg-console-body::-webkit-scrollbar-button {
+    width: 16px; height: 16px; background-color: #4c5844; background-repeat: no-repeat; background-position: center;
+    border-style: outset; border-width: 1px; border-color: #889180 #282e22 #282e22 #889180;
+}
+.corg-console-body::-webkit-scrollbar-button:vertical:increment { background-image: url('images/steam2003/scroll-down.png'); }
+.corg-console-body::-webkit-scrollbar-button:vertical:decrement { background-image: url('images/steam2003/scroll-up.png'); }
+
+/* Installed games. One shell for all of them: titlebar, then the game filling
+   everything under it. */
+.gameapp-window { display: flex; flex-direction: column; }
+#gameapp-iframe { flex: 1; width: 100%; min-height: 0; border: none; display: block; background: #000; }
+
+.task-btn { width: 120px; text-align: left; font-size: 11px; gap: 3px; display: flex; align-items: center; font-weight: bold; white-space: nowrap; }
+/* wide enough for "Control Panel" — it wrapped to two lines at the old 90px */
+.settings-btn { width: 118px; margin-left: 4px; }
+
+
+/* mobile patch */ 
+@media screen and (max-width: 800px) {
+    #main-content-wrapper { flex-direction: column; overflow: hidden; align-items: center; justify-content: center; flex: 1; height: auto; padding: 10px; box-sizing: border-box; z-index: auto; }
+    .game-area, .shop-area { flex: 1; width: 100%; height: 100%; margin-bottom: 0; overflow: hidden; }
+    #game-content-inner { justify-content: flex-start; overflow: hidden; }
+    #game-content-inner > div:last-of-type { margin-top: auto; margin-bottom: auto; }
+    #gug-can { margin-bottom: 200px; }
+    #open-shop-btn { display: inline-block; }
+    .shop-close-btn { display: flex; }
+    #shop-overlay-wrapper { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 1500; align-items: center; justify-content: center; }
+    #shop-overlay-wrapper.mobile-open { display: flex !important; }
+    #shop-overlay-wrapper .shop-area { width: 95vw; height: 85vh; max-width: 500px; box-shadow: 5px 5px 15px rgba(0,0,0,0.8); flex: none; }
+    .popup-ad { width: 200px !important; font-size: 10px; }
+    .popup-ad .win98-titlebar { font-size: 11px; padding: 2px 4px; }
+    /* Shards are pieces of an ad, so they have to be sized like one here too —
+       their width comes from the ad they were cut from, hence no !important. */
+    .ad-shard-face { font-size: 10px; }
+    .ad-shard-face .win98-titlebar { font-size: 11px; padding: 2px 4px; }
+    .popup-content { padding: 6px; }
+    .popup-content iframe { height: 110px !important; }
+
+    #win95-taskbar {
+        gap: 2px;
+    }
+    
+    .task-btn {
+        flex: 1; 
+        width: auto !important; 
+        min-width: 25px; 
+        padding: 2px !important;
+        margin-left: 0 !important; 
+        font-size: 10px;
+        
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis; 
+    }
+
+    #start-button, #system-tray {
+        flex-shrink: 0; 
+    }
+}
+
+@keyframes smoothZoomFade { 0% { opacity: 0; transform: scale(0.7); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes simpleFade { 0% { opacity: 0; } 100% { opacity: 1; } }
+.fade-in-only { animation: simpleFade 0.35s ease-out forwards; }
+.zoom-fade-in { animation: smoothZoomFade 0.35s cubic-bezier(0.2, 0, 0.1, 1) forwards; }
+
+/* ==================== WINDOWS 95 START MENU ==================== */
+.win95-start-menu {
+    position: fixed;
+    bottom: var(--taskbar-height);
+    left: 2px;
+    width: 260px;
+    background-color: var(--win-gray);
+    border: 2px solid;
+    border-color: var(--win-white) var(--win-black) var(--win-black) var(--win-white);
+    box-shadow: inset 1px 1px var(--win-light), inset -1px -1px var(--win-dark-gray), 2px 2px 6px rgba(0,0,0,0.5);
+    display: flex;
+    z-index: 10001;
+    padding: 3px;
+    box-sizing: border-box;
+    animation: popIn 0.12s ease-out;
+}
+
+.win95-start-banner {
+    width: 26px;
+    background: linear-gradient(180deg, #000080 0%, #1084d0 50%, #000080 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 8px;
+    flex-shrink: 0;
+}
+.win95-start-banner span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    color: var(--win-white);
+    font-weight: bold;
+    font-style: italic;
+    font-size: 18px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.win95-start-programs {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 2px;
+    min-width: 0;
+}
+
+.win95-program-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 8px;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--win-black);
+    cursor: pointer;
+    white-space: nowrap;
+}
+.win95-program-item img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+}
+.win95-program-item:hover {
+    background-color: var(--win-blue);
+    color: var(--win-white);
+}
+
+.win95-start-divider {
+    height: 2px;
+    margin: 4px 4px;
+    border-top: 1px solid var(--win-dark-gray);
+    border-bottom: 1px solid var(--win-white);
+}
+
+/* ==================== WINDOWS 11 THEME SYSTEM ==================== */
+body.win11-theme {
+    background: url('images/win11/wallpaper.jpg') center/cover no-repeat fixed !important;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+}
+
+body.win11-theme .win98-window {
+    background: rgba(243, 243, 243, 0.88) !important;
+    backdrop-filter: blur(25px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.7) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+    overflow: hidden !important;
+}
+
+/* Win11 popups fade+slide+scale in (Fluent Design style) instead of the
+   snappy win95 popIn scale-only animation. Ads are positioned via random
+   left/top (not left:50%-centered like the win11 start menu), so this uses
+   a plain vertical slide instead of win11PopUp's translate(-50%, ...). */
+body.win11-theme .popup-ad { animation: win11AdPopUp 0.25s cubic-bezier(0.1, 0.9, 0.2, 1) !important; }
+@keyframes win11AdPopUp {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+body.win11-theme .win98-titlebar {
+    background: rgba(255, 255, 255, 0.5) !important;
+    color: #1c1c1c !important;
+    font-family: 'Segoe UI', system-ui, sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    padding: 8px 14px !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+body.win11-theme .win98-button {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    border-radius: 6px !important;
+    color: #1c1c1c !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04) !important;
+    transition: all 0.15s ease !important;
+}
+
+body.win11-theme .win98-button:hover:not(:disabled) {
+    background: rgba(0, 103, 192, 0.08) !important;
+    border-color: #0067c0 !important;
+    color: #0067c0 !important;
+}
+
+body.win11-theme .win98-button:active:not(:disabled) {
+    background: rgba(0, 103, 192, 0.15) !important;
+    transform: scale(0.98) !important;
+    padding: 4px !important;
+    box-shadow: none !important;
+}
+
+body.win11-theme .close-btn {
+    border-radius: 4px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #555 !important;
+}
+
+body.win11-theme .close-btn:hover {
+    background: #e81123 !important;
+    color: #ffffff !important;
+}
+
+body.win11-theme #win95-taskbar {
+    background: rgba(243, 243, 243, 0.85) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.5) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
+    height: 48px !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 4px 12px !important;
+    border-radius: 12px 12px 0 0 !important;
+    margin: 0 10px !important;
+}
+
+body.win11-theme #start-button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 6px !important;
+    padding: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    box-sizing: border-box !important;
+}
+body.win11-theme #start-button:hover {
+    background: rgba(255, 255, 255, 0.6) !important;
+}
+body.win11-theme #start-button img {
+    width: 20px !important;
+    height: 20px !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+body.win11-theme #start-button span {
+    display: none !important;
+}
+
+body.win11-theme .taskbar-divider {
+    display: none !important;
+}
+
+body.win11-theme .task-btn {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 6px !important;
+    height: 36px !important;
+    width: auto !important;
+    padding: 0 12px !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: #1a1a1a !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+    transition: all 0.15s ease !important;
+}
+body.win11-theme .task-btn:hover {
+    background: rgba(255, 255, 255, 0.85) !important;
+    border-color: rgba(0, 103, 192, 0.3) !important;
+}
+body.win11-theme .task-btn img {
+    width: 16px !important;
+    height: 16px !important;
+    object-fit: contain !important;
+}
+/* Corgpilot's mark is a rounded blob with its own transparent padding baked
+   in, so it always reads a size smaller than the flat square icons beside it:
+   at 16px it looked like a mistake and at 22px it still sat small. 27px is
+   what actually matches a 16px flat icon once the blob's own margin is taken
+   off, and it still clears the 36px button. */
+.task-btn .corgpilot-btn-icon,
+body.win11-theme .task-btn img.corgpilot-btn-icon {
+    width: 27px !important;
+    height: 27px !important;
+    margin: -4px 0 !important;
+    margin-right: 1px !important;
+}
+
+body.win11-theme #system-tray {
+    position: absolute !important;
+    right: 15px !important;
+    background: rgba(255, 255, 255, 0.5) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 6px !important;
+    height: 32px !important;
+    padding: 0 10px !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    color: #1c1c1c !important;
+}
+
+body.win11-theme .win98-tabs {
+    background: transparent !important;
+    border: none !important;
+    gap: 6px !important;
+}
+
+body.win11-theme .win98-tab {
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    margin-top: 0 !important;
+    padding: 6px 16px !important;
+    font-family: 'Segoe UI', sans-serif !important;
+}
+
+body.win11-theme .win98-tab.active {
+    background: #0067c0 !important;
+    color: #ffffff !important;
+    border-color: #0067c0 !important;
+    box-shadow: 0 2px 8px rgba(0, 103, 192, 0.3) !important;
+}
+
+body.win11-theme .score-container {
+    border-radius: 8px !important;
+    border: 1px solid rgba(0,0,0,0.1) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+    font-family: 'Segoe UI', sans-serif !important;
+}
+
+/* Achievements.exe, Fluent: no panel tint under the acrylic window, and the
+   rows are flat white cards with a hairline and a soft shadow. */
+body.win11-theme .achievements-body {
+    background: transparent !important;
+    padding: 4px 14px 14px !important;
+}
+body.win11-theme .achievements-heading {
+    color: #1b1b1b !important;
+    font-weight: 600 !important;
+    text-shadow: none !important;
+    letter-spacing: -0.2px !important;
+}
+body.win11-theme .achievements-body .divider {
+    height: 1px !important;
+    border: none !important;
+    background: rgba(0, 0, 0, 0.09) !important;
+    margin: 12px 0 !important;
+}
+body.win11-theme .achievement-item {
+    background: rgba(255, 255, 255, 0.75) !important;
+    border: 1px solid rgba(0, 0, 0, 0.07) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05) !important;
+    padding: 12px !important;
+}
+body.win11-theme .achievement-text strong {
+    color: #0067c0 !important;
+    font-weight: 600 !important;
+}
+body.win11-theme .achievement-text span { color: #444 !important; }
+
+/* Win11 Scrollbars */
+body.win11-theme ::-webkit-scrollbar { width: 8px !important; height: 8px !important; background: transparent !important; }
+body.win11-theme ::-webkit-scrollbar-track { background: transparent !important; }
+body.win11-theme ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.25) !important; border-radius: 4px !important; border: none !important; box-shadow: none !important; }
+body.win11-theme ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.4) !important; }
+body.win11-theme ::-webkit-scrollbar-button { display: none !important; }
+
+/* Win11 Speech Bubble */
+body.win11-theme .guggy-bubble {
+    background: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    color: #1a1a1a !important;
+}
+body.win11-theme .guggy-bubble-tail {
+    border-top-color: rgba(255, 255, 255, 0.94) !important;
+}
+body.win11-theme .guggy-btn {
+    background: #0067c0 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 6px !important;
+    font-family: 'Segoe UI', sans-serif !important;
+    font-weight: 600 !important;
+    padding: 4px 16px !important;
+    box-shadow: 0 2px 6px rgba(0, 103, 192, 0.3) !important;
+}
+
+/* Win11 Desktop Labels */
+body.win11-theme .win98-desktop-label,
+body.win11-theme .trashcan-label,
+body.win11-theme .desktop-icon span {
+    font-family: 'Segoe UI', sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    background: rgba(0, 0, 0, 0.35) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-radius: 6px !important;
+    padding: 2px 8px !important;
+    text-shadow: none !important;
+    color: #ffffff !important;
+}
+
+/* Win11 Toast Notifications */
+body.win11-theme .toast-notification {
+    background: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(20px) saturate(180%) !important;
+    border-radius: 10px !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2) !important;
+    font-family: 'Segoe UI', sans-serif !important;
+}
+
+/* Win11 Inputs & Controls */
+body.win11-theme .win98-input {
+    border-radius: 4px !important;
+    border: 1px solid rgba(0,0,0,0.2) !important;
+    box-shadow: none !important;
+    padding: 3px 6px !important;
+    font-family: 'Segoe UI', sans-serif !important;
+}
+body.win11-theme input[type=range]::-webkit-slider-thumb {
+    border-radius: 50% !important;
+    background: #0067c0 !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2) !important;
+}
+
+body.win11-theme .win95-start-menu {
+    display: none !important;
+}
+
+body.win11-theme .guggy-container {
+    bottom: 68px !important;
+}
+
+/* =====================================================================
+   CORGOS 10 theme — flat, square, and one accent colour.
+
+   Written from the OS's own look rather than lifted from anywhere: the
+   win10-replica repo this theme was asked to draw on ships no licence
+   at all, so none of its CSS or assets are used here and the wallpaper
+   and Start mark under images/win10/ are drawn for this project.
+
+   The whole of 10's visual language is three decisions — everything is
+   a rectangle, everything is either near-white or near-black, and one
+   accent blue does all the highlighting — so that is what this block
+   is. Square corners are load-bearing: 7 was glass, 11 is rounded, and
+   the thing that dates 10 between them is the hard 90-degree corner.
+   ===================================================================== */
+body.win10-theme {
+    --w10-accent: #0078d7;
+    --w10-accent-dim: #005a9e;
+    --w10-chrome: #1f1f1f;
+    --w10-panel: #f2f2f2;
+    background: url('images/win10/wallpaper.png') center/cover no-repeat fixed !important;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+}
+
+/* Windows: white, square, one hairline border, a real shadow. */
+body.win10-theme .win98-window {
+    background: #ffffff !important;
+    border: 1px solid #d6d6d6 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 6px 26px rgba(0, 0, 0, 0.35) !important;
+    color: #1a1a1a !important;
+}
+
+body.win10-theme .popup-ad { animation: win11AdPopUp 0.18s cubic-bezier(0.1, 0.9, 0.2, 1) !important; }
+
+/* 10's titlebar is the window's own colour with dark text — the accent
+   only lands on the title bar when you turn that option on, and nobody
+   turns that option on. */
+body.win10-theme .win98-titlebar {
+    background: #ffffff !important;
+    color: #1a1a1a !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    min-height: 32px !important;
+    padding: 0 4px 0 12px !important;
+    border-bottom: 1px solid #eaeaea !important;
+    text-shadow: none !important;
+}
+
+body.win10-theme .win98-content,
+body.win10-theme .win98-tabs {
+    background: #ffffff !important;
+    border: none !important;
+}
+
+body.win10-theme .win98-button {
+    background: #e1e1e1 !important;
+    border: 1px solid #adadad !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    color: #1a1a1a !important;
+    padding: 5px 12px !important;
+    font-family: 'Segoe UI', system-ui, sans-serif !important;
+    transition: background 0.08s linear, border-color 0.08s linear !important;
+}
+body.win10-theme .win98-button:hover:not(:disabled) {
+    background: #e5f1fb !important;
+    border-color: var(--w10-accent) !important;
+}
+body.win10-theme .win98-button:active:not(:disabled) {
+    background: #cce4f7 !important;
+    border-color: var(--w10-accent-dim) !important;
+}
+
+/* The close button is the one piece of chrome 10 paints red, and only
+   on hover. */
+body.win10-theme .close-btn {
+    background: transparent !important;
+    border: none !important;
+    width: 46px !important;
+    height: 30px !important;
+    color: #1a1a1a !important;
+    font-size: 12px !important;
+}
+body.win10-theme .close-btn:hover {
+    background: #e81123 !important;
+    color: #fff !important;
+    border: none !important;
+}
+
+/* Taskbar: near-black, full width, square buttons with an accent
+   underline on the active one. */
+body.win10-theme #win95-taskbar {
+    background: rgba(20, 20, 20, 0.92) !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    height: 40px !important;
+}
+
+body.win10-theme #start-button {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    width: 48px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+body.win10-theme #start-button:hover { background: rgba(255, 255, 255, 0.12) !important; }
+body.win10-theme #start-button img { width: 20px !important; height: 20px !important; }
+body.win10-theme #start-button span { display: none !important; }
+
+body.win10-theme .taskbar-divider { display: none !important; }
+
+body.win10-theme .task-btn {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    height: 40px !important;
+    padding: 0 12px !important;
+    color: #f0f0f0 !important;
+    font-size: 12px !important;
+}
+body.win10-theme .task-btn:hover {
+    background: rgba(255, 255, 255, 0.10) !important;
+    border-bottom-color: var(--w10-accent) !important;
+}
+body.win10-theme .task-btn img {
+    width: 16px !important;
+    height: 16px !important;
+    object-fit: contain !important;
+}
+
+body.win10-theme #system-tray {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    height: 40px !important;
+    padding: 0 12px !important;
+    color: #f0f0f0 !important;
+    font-size: 12px !important;
+}
+
+/* Start menu: the shared 95 markup, restyled as 10's dark panel — a
+   column of apps against near-black, accent on hover, square. */
+body.win10-theme .win95-start-menu {
+    background: rgba(28, 28, 28, 0.96) !important;
+    backdrop-filter: blur(18px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 0 !important;
+    box-shadow: 0 -2px 30px rgba(0, 0, 0, 0.5) !important;
+    color: #f0f0f0 !important;
+    padding: 6px 0 !important;
+    width: 300px !important;
+    animation: win10MenuUp 0.16s ease-out !important;
+}
+@keyframes win10MenuUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+body.win10-theme .win95-start-banner { display: none !important; }
+
+body.win10-theme .win95-program-item {
+    color: #f0f0f0 !important;
+    background: transparent !important;
+    border: none !important;
+    border-left: 3px solid transparent !important;
+    padding: 8px 14px !important;
+    font-size: 12.5px !important;
+}
+body.win10-theme .win95-program-item:hover {
+    background: rgba(255, 255, 255, 0.10) !important;
+    border-left-color: var(--w10-accent) !important;
+}
+body.win10-theme .win95-program-item img { width: 18px !important; height: 18px !important; }
+body.win10-theme .win95-shutdown-item { border-top: 1px solid rgba(255, 255, 255, 0.08) !important; }
+
+/* Tabs, panels, the bits of the clicker that carry chrome. */
+body.win10-theme .win98-tab {
+    background: #f2f2f2 !important;
+    border: 1px solid #d6d6d6 !important;
+    border-radius: 0 !important;
+    color: #444 !important;
+    font-size: 12px !important;
+    padding: 6px 14px !important;
+}
+body.win10-theme .win98-tab.active {
+    background: #ffffff !important;
+    border-bottom-color: #ffffff !important;
+    color: var(--w10-accent) !important;
+}
+
+body.win10-theme .score-container {
+    background: #f7f7f7 !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+}
+
+body.win10-theme .win98-input {
+    background: #fff !important;
+    border: 1px solid #adadad !important;
+    border-radius: 0 !important;
+    color: #1a1a1a !important;
+}
+body.win10-theme input[type=range]::-webkit-slider-thumb {
+    background: var(--w10-accent) !important;
+    border-radius: 50% !important;
+}
+
+/* Desktop labels get 10's shadow so they stay legible on the wallpaper. */
+body.win10-theme .win98-desktop-label,
+body.win10-theme .trashcan-label,
+body.win10-theme .desktop-icon span {
+    color: #fff !important;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9) !important;
+    font-size: 12px !important;
+}
+
+/* Scrollbars: 10's thin grey, square, no arrows worth drawing. */
+body.win10-theme ::-webkit-scrollbar { width: 12px; height: 12px; }
+body.win10-theme ::-webkit-scrollbar-track { background: #f0f0f0; }
+body.win10-theme ::-webkit-scrollbar-thumb { background: #cdcdcd; border: 3px solid #f0f0f0; }
+body.win10-theme ::-webkit-scrollbar-thumb:hover { background: #a6a6a6; }
+body.win10-theme ::-webkit-scrollbar-button { display: none; }
+
+body.win10-theme .guggy-bubble {
+    background: #fff !important;
+    border: 1px solid #d6d6d6 !important;
+    border-radius: 0 !important;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28) !important;
+    color: #1a1a1a !important;
+}
+body.win10-theme .guggy-bubble-tail { border-top-color: #fff !important; }
+body.win10-theme .guggy-btn {
+    background: #e1e1e1 !important;
+    border: 1px solid #adadad !important;
+    border-radius: 0 !important;
+    color: #1a1a1a !important;
+}
+body.win10-theme .guggy-container { bottom: 52px !important; }
+
+body.win10-theme .toast-notification {
+    background: rgba(28, 28, 28, 0.96) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 0 !important;
+    color: #f0f0f0 !important;
+}
+
+/* Corgpilot does not exist on 10 — win11-only launchers are strictly hidden */
+body.win10-theme .desktop-icon.win11-only,
+body.win10-theme .task-btn.win11-only,
+body.win10-theme .win11-only { display: none !important; }
+
+/* =====================================================================
+   CORGOS COPILOT theme — 11, with the assistant in every socket.
+
+   Everything visual is inherited: the body carries `win11-theme` as
+   well, so this block only holds the parts that are the joke. The rest
+   of it — every icon swapped for the Corgpilot mark, every label reading
+   "Corgpilot", every launcher opening the assistant — is applyCorgpilotOS()
+   in main.js, because it has to be undone when you boot something else.
+   ===================================================================== */
+
+/* On 11 these two are hidden unless the theme is 11. Here every icon is
+   Corgpilot, so the dedicated one would be a duplicate. */
+body.corgpilot-theme .desktop-icon.win11-only,
+body.corgpilot-theme .task-btn.win11-only { display: none !important; }
+
+/* The mark has its own padding baked in, so it needs a size up wherever
+   it now sits — which, on this theme, is everywhere. */
+body.corgpilot-theme .desktop-icon > img { width: 44px !important; height: 44px !important; }
+body.corgpilot-theme .win11-app-item > img { width: 34px !important; height: 34px !important; }
+body.corgpilot-theme .win95-program-item > img { width: 22px !important; height: 22px !important; }
+body.corgpilot-theme .task-btn > img { width: 24px !important; height: 24px !important; margin: -4px 0 !important; }
+body.corgpilot-theme #start-button > img { width: 22px !important; height: 22px !important; }
+
+/* The Start menu is one wall of the same app, so it says so. */
+body.corgpilot-theme .win11-section-header span:first-child { font-size: 0 !important; }
+body.corgpilot-theme .win11-section-header span:first-child::after {
+    content: 'Corgpilot'; font-size: 13px;
+}
+body.corgpilot-theme .win11-search-bar input::placeholder { color: #6b6b75; }
+
+/* A faint sweep across the taskbar, the way a machine that is always
+   thinking about you would look. */
+body.corgpilot-theme #win95-taskbar::after {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #0067c0, #7a4ddb, transparent);
+    background-size: 200% 100%;
+    animation: cpSweep 4s linear infinite;
+    pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+    body.corgpilot-theme #win95-taskbar::after { animation: none; }
+    body.win10-theme .win95-start-menu { animation: none !important; }
+}
+
+/* =====================================================================
+   CORGOS 7 theme — Aero glass.
+   Gradients / shadows / metrics taken from nainemom/win7 (Apache-2.0):
+   src/C:/Windows/system/components/Window.vue + Taskbar/*.vue
+   ===================================================================== */
+body.win7-theme {
+    background: url('images/win7/wallpaper.jpg') center/cover no-repeat fixed !important;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif !important;
+}
+
+body.win7-theme .win98-window {
+    background: linear-gradient(180deg,
+        rgba(250,250,250,0.10) 0%,
+        rgba(255,255,255,0.40) 30%,
+        rgba(70,70,70,0.20) 40%,
+        rgba(170,170,170,0.10) 100%) , rgba(150,170,190,0.55) !important;
+    backdrop-filter: blur(7px) brightness(0.9) !important;
+    -webkit-backdrop-filter: blur(7px) brightness(0.9) !important;
+    border: none !important;
+    border-radius: 8px !important;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.8), 0 0 8px 3px rgba(10,10,10,0.8) !important;
+    overflow: hidden !important;
+    color: #0b1a2b !important;
+}
+
+body.win7-theme .popup-ad { animation: win11AdPopUp 0.22s cubic-bezier(0.1, 0.9, 0.2, 1) !important; }
+
+body.win7-theme .win98-titlebar {
+    background: transparent !important;
+    color: #06121f !important;
+    font-weight: 600 !important;
+    /* the classic Aero white glow behind titlebar text */
+    text-shadow: 0 0 5px #fff, 0 0 5px #fff, 0 0 5px #fff, 0 0 5px #fff !important;
+    min-height: 32px !important;
+    padding: 0 10px !important;
+    border-bottom: none !important;
+}
+
+body.win7-theme .win98-content,
+body.win7-theme .win98-tabs {
+    background: rgba(240, 244, 248, 0.86) !important;
+}
+body.win7-theme .win98-content {
+    border: solid 1px rgba(10,10,10,0.5) !important;
+    margin: 0 5px 5px 5px !important;
+    max-width: calc(100% - 10px) !important;
+}
+
+body.win7-theme .win98-button {
+    background: linear-gradient(180deg, #f2f7fb 0%, #e3edf7 45%, #d3e2f2 50%, #eaf3fb 100%) !important;
+    border: 1px solid #8ba7c0 !important;
+    border-radius: 3px !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.85) !important;
+    color: #10222f !important;
+    padding: 4px 10px !important;
+}
+body.win7-theme .win98-button:hover:not(:disabled) {
+    background: linear-gradient(180deg, #eaf6fd 0%, #d9effc 45%, #bfe6fb 50%, #e3f6fe 100%) !important;
+    border-color: #3c7fb1 !important;
+}
+body.win7-theme .win98-button:active:not(:disabled) {
+    background: linear-gradient(180deg, #cfe4f5 0%, #bcd8ef 50%, #a9cbe8 100%) !important;
+    padding: 4px 10px !important;
+}
+
+body.win7-theme .close-btn {
+    background: linear-gradient(180deg,
+        rgba(255,107,63,0.8) 0%,
+        rgba(212,116,91,0.7) 40%,
+        rgba(192,55,44,0.9) 55%,
+        rgba(204,33,33,0.7) 80%,
+        rgba(255,125,125,0.9) 100%) !important;
+    color: #fff !important;
+    border: 1px solid rgba(0,0,0,0.5) !important;
+    border-top: none !important;
+    border-radius: 0 0 5px 5px !important;
+    box-shadow: 0 0 3px rgba(255,255,255,0.4), inset 0 0 1px 2px rgba(255,255,255,0.4) !important;
+    text-shadow: none !important;
+    font-weight: bold !important;
+    min-width: 40px !important;
+}
+body.win7-theme .close-btn:hover { filter: brightness(1.25) !important; }
+
+body.win7-theme #win95-taskbar {
+    background: linear-gradient(180deg,
+        rgba(10,10,10,0.8) 0%,
+        rgba(200,200,200,0.9) 4%,
+        rgba(70,70,70,0.4) 5%,
+        rgba(70,70,70,0.4) 100%) !important;
+    backdrop-filter: blur(9px) !important;
+    -webkit-backdrop-filter: blur(9px) !important;
+    border-top: none !important;
+    height: 46px !important;
+    align-items: center !important;
+    gap: 4px !important;
+    padding: 0 6px !important;
+}
+
+body.win7-theme #start-button {
+    background: url('images/win7/orb.png') center/contain no-repeat !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 54px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    filter: drop-shadow(0 0 3px rgba(0,0,0,0.6));
+}
+body.win7-theme #start-button:hover { filter: brightness(1.25) drop-shadow(0 0 5px rgba(120,200,255,0.9)); }
+body.win7-theme #start-button img,
+body.win7-theme #start-button span { display: none !important; }
+
+body.win7-theme .taskbar-divider { display: none !important; }
+
+body.win7-theme .task-btn {
+    background: linear-gradient(150deg,
+        rgba(255,255,255,0.4) 0%,
+        rgba(255,255,255,0.4) 15%,
+        rgba(200,200,200,0.1) 30%,
+        rgba(200,200,200,0.2) 80%,
+        rgba(255,255,255,0.4) 100%) !important;
+    border: solid 1px rgba(10,10,10,0.3) !important;
+    border-radius: 4px !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.35) !important;
+    color: #fff !important;
+    text-shadow: 0 0 1px #000, 0 0 1px #000 !important;
+    height: 34px !important;
+    font-weight: 500 !important;
+}
+body.win7-theme .task-btn:hover {
+    background: linear-gradient(150deg,
+        rgba(255,255,255,0.6) 0%,
+        rgba(255,255,255,0.6) 15%,
+        rgba(200,200,200,0.3) 30%,
+        rgba(200,200,200,0.4) 80%,
+        rgba(255,255,255,0.6) 100%) !important;
+}
+
+body.win7-theme #system-tray {
+    background: linear-gradient(270deg, rgba(10,10,10,0.3) 0%, rgba(10,10,10,0.3) 70%, transparent 100%) !important;
+    border: none !important;
+    color: #fff !important;
+    text-shadow: 0 0 2px #000 !important;
+    height: 100% !important;
+    align-self: stretch !important;
+    padding: 0 12px !important;
+}
+body.win7-theme #tray-clock { color: #fff !important; }
+
+body.win7-theme .win98-tab {
+    background: linear-gradient(180deg, #eef5fb 0%, #dbe8f4 100%) !important;
+    border: 1px solid #9db6cc !important;
+    border-bottom: none !important;
+    border-radius: 4px 4px 0 0 !important;
+    color: #10222f !important;
+}
+body.win7-theme .win98-tab.active {
+    background: linear-gradient(180deg, #ffffff 0%, #eaf3fb 100%) !important;
+    font-weight: 600 !important;
+}
+
+body.win7-theme .win98-input {
+    border: 1px solid #7a9bb8 !important;
+    border-radius: 3px !important;
+    background: rgba(255,255,255,0.92) !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.12) !important;
+}
+
+/* Achievements.exe, Aero: 7's own pale-blue list panel, rows as the rounded
+   white "command link" plates Explorer used all over the shell. */
+body.win7-theme .achievements-body {
+    background: rgba(240, 244, 248, 0.86) !important;
+    padding: 4px 12px 12px !important;
+}
+body.win7-theme .achievements-heading {
+    color: #16538c !important;
+    font-weight: 400 !important;
+    text-shadow: none !important;
+}
+body.win7-theme .achievements-body .divider {
+    height: 1px !important;
+    border: none !important;
+    background: #cddff0 !important;
+    margin: 10px 0 !important;
+}
+body.win7-theme .achievement-item {
+    background: linear-gradient(180deg, #ffffff 0%, #f3f8fc 100%) !important;
+    border: 1px solid #c3d5e6 !important;
+    border-radius: 4px !important;
+    box-shadow: 0 1px 2px rgba(10, 40, 70, 0.12) !important;
+    padding: 10px !important;
+}
+body.win7-theme .achievement-text strong { color: #16538c !important; }
+body.win7-theme .achievement-text span { color: #3a4a5a !important; }
+
+body.win7-theme .desktop-icon span,
+body.win7-theme .trashcan-label {
+    color: #fff !important;
+    text-shadow: 0 1px 3px #000, 0 0 4px #000 !important;
+    background: transparent !important;
+}
+
+/* Win7 reuses the shared start-menu markup, restyled as a glass panel.
+   (It must NOT be display:none — toggleStartMenu() sets an inline display,
+   which an !important none would silently override.) */
+body.win7-theme .win95-start-menu {
+    bottom: 46px !important;
+    left: 4px !important;
+    width: 300px !important;
+    background: rgba(28, 42, 58, 0.82) !important;
+    backdrop-filter: blur(14px) saturate(1.2) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(1.2) !important;
+    border: 1px solid rgba(255,255,255,0.45) !important;
+    border-radius: 6px !important;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.5), 0 8px 26px rgba(0,0,0,0.65) !important;
+    padding: 6px !important;
+}
+body.win7-theme .win95-start-banner { display: none !important; }
+body.win7-theme .win95-program-item {
+    color: #f2f8ff !important;
+    font-weight: 500 !important;
+    border-radius: 3px !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.7) !important;
+}
+body.win7-theme .win95-program-item:hover {
+    background: linear-gradient(180deg, rgba(120,190,255,0.45), rgba(60,140,230,0.5)) !important;
+    color: #fff !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5) !important;
+}
+body.win7-theme .win95-start-divider {
+    border-top: 1px solid rgba(255,255,255,0.18) !important;
+    border-bottom: 1px solid rgba(0,0,0,0.35) !important;
+}
+
+body.win7-theme .guggy-container { bottom: 56px !important; }
+
+body.win7-theme ::-webkit-scrollbar { width: 16px; height: 16px; }
+body.win7-theme ::-webkit-scrollbar-track { background: #eef3f8; }
+body.win7-theme ::-webkit-scrollbar-thumb { background: linear-gradient(90deg, #f3f8fc, #cddff0); border: 1px solid #9db6cc; border-radius: 8px; }
+body.win7-theme ::-webkit-scrollbar-button { display: none; }
+
+/* =====================================================================
+   CORGOS XP theme — Luna blue.
+   Gradients / metrics taken from ShizukuIchi/winXP (MIT):
+   src/WinXP/Windows/index.js + src/WinXP/Footer/index.js
+   ===================================================================== */
+body.winxp-theme {
+    background: url('images/winxp/wallpaper.jpg') center/cover no-repeat fixed !important;
+    font-family: Tahoma, 'Noto Sans', 'MS Sans Serif', sans-serif !important;
+}
+
+body.winxp-theme .win98-window {
+    background-color: #0831d9 !important;
+    border: none !important;
+    border-radius: 8px 8px 0 0 !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.45) !important;
+    padding: 3px !important;
+    overflow: hidden !important;
+}
+
+body.winxp-theme .popup-ad { animation: popIn 0.12s ease-out !important; }
+
+body.winxp-theme .win98-titlebar {
+    background: linear-gradient(to bottom,
+        #0058ee 0%, #3593ff 4%, #288eff 6%, #127dff 8%, #036ffc 10%,
+        #0262ee 14%, #0057e5 20%, #0054e3 24%, #0055eb 56%, #005bf5 66%,
+        #026afe 76%, #0062ef 86%, #0052d6 92%, #0040ab 94%, #003092 100%) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    text-shadow: 1px 1px #000 !important;
+    letter-spacing: 0.5px !important;
+    min-height: 25px !important;
+    border-radius: 5px 5px 0 0 !important;
+    padding: 0 3px 0 5px !important;
+}
+
+body.winxp-theme .win98-content,
+body.winxp-theme .win98-tabs {
+    background: #ece9d8 !important;
+    border: none !important;
+}
+
+body.winxp-theme .win98-button {
+    background: linear-gradient(180deg, #fff 0%, #f2f2ec 45%, #e6e6d8 50%, #f5f5ef 100%) !important;
+    border: 1px solid #003c74 !important;
+    border-radius: 3px !important;
+    box-shadow: inset 0 0 0 1px #fff !important;
+    color: #000 !important;
+    padding: 4px 10px !important;
+}
+body.winxp-theme .win98-button:hover:not(:disabled) {
+    border-color: #f0a30a !important;
+    background: linear-gradient(180deg, #fff 0%, #fdf6d8 45%, #fbeeae 50%, #fff8e0 100%) !important;
+}
+body.winxp-theme .win98-button:active:not(:disabled) {
+    background: linear-gradient(180deg, #dfdfd2 0%, #ebebe0 100%) !important;
+    padding: 4px 10px !important;
+}
+
+body.winxp-theme .close-btn {
+    background: linear-gradient(180deg, #e8836c 0%, #d8492b 45%, #c33d20 55%, #e4735c 100%) !important;
+    border: 1px solid #d84f31 !important;
+    border-radius: 3px !important;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.55) !important;
+    color: #fff !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.5) !important;
+    min-width: 21px !important;
+    padding: 1px 5px !important;
+}
+body.winxp-theme .close-btn:hover { filter: brightness(1.15) !important; }
+
+body.winxp-theme #win95-taskbar {
+    background: linear-gradient(to bottom,
+        #1f2f86 0, #3165c4 3%, #3682e5 6%, #4490e6 10%, #3883e5 12%,
+        #2b71e0 15%, #2663da 18%, #235bd6 20%, #2258d5 23%, #2157d6 38%,
+        #245ddb 54%, #2562df 86%, #245fdc 89%, #2158d4 92%, #1d4ec0 95%,
+        #1941a5 98%) !important;
+    border-top: 1px solid #1042af !important;
+    height: 30px !important;
+    align-items: center !important;
+    padding: 0 !important;
+    gap: 3px !important;
+}
+
+body.winxp-theme #start-button {
+    background: url('images/winxp/start.png') left center/contain no-repeat !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 96px !important;
+    height: 30px !important;
+    padding: 0 !important;
+    margin-right: 8px !important;
+}
+body.winxp-theme #start-button:hover { filter: brightness(1.06) !important; }
+body.winxp-theme #start-button:active { filter: brightness(0.88) !important; }
+body.winxp-theme #start-button img,
+body.winxp-theme #start-button span { display: none !important; }
+
+body.winxp-theme .taskbar-divider { display: none !important; }
+
+body.winxp-theme .task-btn {
+    background: linear-gradient(180deg, #3c81f3 0%, #3179ef 8%, #2b6fe0 40%, #2f74e8 88%, #4a8cf7 100%) !important;
+    border: 1px solid #1e50a8 !important;
+    border-radius: 3px !important;
+    color: #fff !important;
+    font-weight: normal !important;
+    height: 22px !important;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.35) !important;
+}
+body.winxp-theme .task-btn:hover { filter: brightness(1.12) !important; }
+
+body.winxp-theme #system-tray {
+    background: linear-gradient(to bottom,
+        #0c59b9 1%, #139ee9 6%, #18b5f2 10%, #139beb 14%, #1290e8 19%,
+        #0d8dea 63%, #0d9ff1 81%, #0f9eed 88%, #119be9 91%, #1392e2 94%,
+        #137ed7 97%, #095bc9 100%) !important;
+    border-left: 1px solid #1042af !important;
+    box-shadow: inset 1px 0 1px #18bbff !important;
+    padding: 0 12px !important;
+    /* keep the base `margin-left: auto` — it's what pins the tray to the
+       right edge of the taskbar. Overriding it with a fixed margin parks the
+       clock right next to the task buttons instead. */
+    margin-left: auto !important;
+    color: #fff !important;
+    height: 100% !important;
+    align-self: stretch !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+}
+body.winxp-theme #tray-clock { color: #fff !important; font-size: 11px !important; }
+
+body.winxp-theme .win98-tab {
+    background: linear-gradient(180deg, #fdfdfa 0%, #eeeade 100%) !important;
+    border: 1px solid #a0a08a !important;
+    border-bottom: none !important;
+    border-radius: 3px 3px 0 0 !important;
+    color: #000 !important;
+}
+body.winxp-theme .win98-tab.active {
+    background: #fff !important;
+    font-weight: bold !important;
+}
+
+body.winxp-theme .win98-input {
+    border: 1px solid #7f9db9 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+}
+
+/* Achievements.exe, Luna: the beige panel the rest of XP's window bodies use,
+   with rows as flat white list items edged in Luna's blue-grey. */
+body.winxp-theme .achievements-body {
+    background: #ece9d8 !important;
+    padding: 4px 10px 10px !important;
+}
+body.winxp-theme .achievements-heading {
+    color: #003399 !important;
+    text-shadow: none !important;
+}
+body.winxp-theme .achievements-body .divider {
+    height: 1px !important;
+    border: none !important;
+    background: #aca899 !important;
+    margin: 8px 0 !important;
+}
+body.winxp-theme .achievement-item {
+    background: #fff !important;
+    border: 1px solid #b6bdd2 !important;
+    border-radius: 3px !important;
+    box-shadow: none !important;
+    padding: 8px !important;
+}
+body.winxp-theme .achievement-text strong { color: #0831d9 !important; }
+body.winxp-theme .achievement-text span { color: #3b3b3b !important; }
+
+body.winxp-theme .desktop-icon span,
+body.winxp-theme .trashcan-label {
+    color: #fff !important;
+    text-shadow: 0 1px 3px #000, 0 0 4px #000 !important;
+    background: transparent !important;
+}
+
+/* XP reuses the shared start-menu markup, restyled Luna-blue: gradient
+   header bar, white program list, blue footer strip.
+   (Must NOT be display:none — see the win7 note above.) */
+body.winxp-theme .win95-start-menu {
+    bottom: 30px !important;
+    left: 0 !important;
+    width: 300px !important;
+    background: #fff !important;
+    border: none !important;
+    border-radius: 0 0 6px 6px !important;
+    box-shadow: 2px 4px 8px rgba(0,0,0,0.5) !important;
+    padding: 0 !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    border-left: 1px solid #2158d5 !important;
+    border-right: 1px solid #2158d5 !important;
+    border-bottom: 1px solid #2158d5 !important;
+}
+/* the vertical "Windows 95" spine becomes XP's horizontal user header */
+body.winxp-theme .win95-start-banner {
+    width: 100% !important;
+    height: 54px !important;
+    background: linear-gradient(to bottom, #0058ee 0%, #3f8ef4 45%, #1c6fe0 55%, #0d55c8 100%) !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 0 12px !important;
+    border-bottom: 2px solid #0a4bb5 !important;
+}
+body.winxp-theme .win95-start-banner span {
+    writing-mode: horizontal-tb !important;
+    transform: none !important;
+    font-style: normal !important;
+    font-size: 15px !important;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.6) !important;
+}
+body.winxp-theme .win95-start-programs { background: #fff !important; padding: 6px 4px !important; }
+body.winxp-theme .win95-program-item {
+    color: #00186c !important;
+    font-weight: normal !important;
+    font-size: 12px !important;
+}
+body.winxp-theme .win95-program-item:hover {
+    background: linear-gradient(to bottom, #2f7ce8, #1c5fd0) !important;
+    color: #fff !important;
+}
+body.winxp-theme .win95-start-divider {
+    border-top: 1px solid #c8c8c8 !important;
+    border-bottom: none !important;
+}
+body.winxp-theme .win95-shutdown-item {
+    background: linear-gradient(to bottom, #4a8ae8 0%, #2f6fd8 50%, #1e59c4 100%) !important;
+    color: #fff !important;
+    margin-top: 4px !important;
+}
+
+body.winxp-theme .guggy-container { bottom: 40px !important; }
+
+body.winxp-theme ::-webkit-scrollbar { width: 16px; height: 16px; }
+body.winxp-theme ::-webkit-scrollbar-track { background: #f1efe2; }
+body.winxp-theme ::-webkit-scrollbar-thumb { background: linear-gradient(90deg, #fff, #c8d3e8); border: 1px solid #7f9db9; }
+body.winxp-theme ::-webkit-scrollbar-button { display: none; }
+
+/* Win11 Start Menu */
+.win11-start-menu {
+    position: fixed;
+    bottom: 58px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 480px;
+    max-width: 90vw;
+    background: rgba(243, 243, 243, 0.92);
+    backdrop-filter: blur(30px) saturate(190%);
+    -webkit-backdrop-filter: blur(30px) saturate(190%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    /* Below the taskbar (10000) on purpose: the menu slides up out of it,
+       and the taskbar has to be the thing it slides out from. */
+    z-index: 9999;
+    padding: 20px;
+    box-sizing: border-box;
+    /* It grows out of the taskbar edge, so it scales from its own bottom. */
+    transform-origin: 50% 100%;
+    animation: win11SlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+/* Real 11 doesn't pop the menu in place — it rises out of the taskbar and
+   settles, and it drops back into it on the way out. `.closing` is set by
+   hideStartMenu() in main.js, which holds the menu on screen for the length
+   of win11SlideDown before hiding it; the rise is restarted by hand there
+   too, so re-opening mid-close still rises. */
+@keyframes win11SlideUp {
+    from { opacity: 0; transform: translate(-50%, 96px) scale(0.96); }
+    45% { opacity: 1; }
+    to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+.win11-start-menu.closing {
+    animation: win11SlideDown 0.18s cubic-bezier(0.4, 0, 1, 1) forwards;
+    pointer-events: none;
+}
+@keyframes win11SlideDown {
+    from { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    to { opacity: 0; transform: translate(-50%, 96px) scale(0.97); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .win11-start-menu, .win11-start-menu.closing { animation: none; }
+}
+
+.win11-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 20px;
+    padding: 8px 14px;
+    margin-bottom: 20px;
+}
+.win11-search-bar input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    outline: none;
+    font-size: 13px;
+    color: #333;
+}
+
+.win11-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #1a1a1a;
+}
+.win11-small-btn {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.win11-pinned-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.win11-app-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+    text-align: center;
+}
+.win11-app-item:hover {
+    background: rgba(255, 255, 255, 0.7);
+}
+.win11-app-item img {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 6px;
+    object-fit: contain;
+}
+.win11-app-item span {
+    font-size: 12px;
+    color: #333;
+    font-weight: 500;
+}
+
+.win11-start-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+.win11-user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+}
+.win11-power-btn {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+.win11-power-btn:hover {
+    background: rgba(220, 50, 50, 0.15);
+}
+
+/* ---------------------------------------------------------------
+   Title screen. Sits above everything (including the boot manager) —
+   it's the first thing shown, and PLAY hands straight off to CORG OS
+   Setup.
+
+   Deliberately bare: white page, corg, and PLAY / SETTINGS as plain
+   black Comic Sans text. Black and white only, no borders, no boxes,
+   no animations or transitions anywhere on this screen. Hover just
+   underlines.
+   --------------------------------------------------------------- */
+#main-menu-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000002;
+    background: #fff;
+    color: #000;
+    /* Gordin, the title screen's own face (fonts/gordin-regular.ttf). Comic
+       Sans stays behind it as the fallback, which is what this screen wore
+       before and is still the right shape if the file ever fails to load. */
+    font-family: 'Gordin', 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Segoe Print', cursive;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-y: auto;
+    user-select: none;
+}
+#main-menu-screen.open { display: flex; }
+
+/* auto margins here and on the footer centre the lot while still letting a
+   short window scroll instead of clipping the top off */
+.main-menu-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    width: min(420px, 88vw);
+    margin: auto 0 0;
+    padding: 24px 0 0;
+}
+
+/* The wordmark: the dog, with "OS" after him. The box is the size of the
+   picture alone and the letters are positioned out of flow inside it, so the
+   dog stays centred over PLAY/SETTINGS exactly as before — laying the two out
+   side by side instead centres the *pair*, which shoves the dog off to the
+   left of everything beneath him. */
+.mm-wordmark {
+    position: relative;
+    display: inline-block;
+    line-height: 0;
+    cursor: pointer;
+}
+
+.mm-corg {
+    display: block;
+    width: clamp(140px, 30vw, 210px);
+    height: auto;
+    cursor: pointer;
+    -webkit-user-drag: none;
+}
+
+/* Percentages, not pixels, because the picture is fluid — and both are
+   measured against the dog rather than against his (generously transparent)
+   bounding box: level with his feet, tucked in beside his flank. */
+.mm-os {
+    position: absolute;
+    left: 82%;
+    bottom: 11%;
+    font-size: clamp(30px, 6.5vw, 46px);
+    line-height: 1;
+    color: #000;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+.main-menu-buttons { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+
+/* text, not buttons: no border, no background, no padding to speak of */
+.main-menu-btn {
+    font-family: inherit;
+    font-size: clamp(20px, 3vw, 28px);
+    line-height: 1.35;
+    padding: 0;
+    color: #000;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+.main-menu-btn:hover,
+.main-menu-btn:focus-visible {
+    text-decoration: underline;
+    outline: none;
+}
+
+.main-menu-btn.mm-small { font-size: clamp(13px, 1.6vw, 15px); }
+
+.main-menu-settings {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    color: #000;
+}
+.main-menu-settings.open { display: flex; }
+
+.mm-setting { display: flex; align-items: center; gap: 10px; font-size: clamp(12px, 1.5vw, 15px); }
+.mm-setting label { width: 5.5em; flex-shrink: 0; }
+.mm-setting input[type="range"] { flex: 1; accent-color: #000; min-width: 0; }
+.mm-value { width: 3.5em; text-align: right; flex-shrink: 0; }
+
+.mm-check {
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    font-size: clamp(12px, 1.5vw, 15px);
+}
+.mm-check input { width: 14px; height: 14px; accent-color: #000; cursor: pointer; }
+
+.main-menu-footer {
+    width: min(420px, 88vw);
+    margin: 26px 0 auto;
+    padding-bottom: 22px;
+    font-size: clamp(10px, 1.1vw, 12px);
+    text-align: center;
+    color: #000;
+}
+
+/* The content note under the credit. Quieter than the credit but on the same
+   black-and-white terms as the rest of this screen — no colour, no box. */
+.main-menu-warning {
+    display: block;
+    margin-top: 7px;
+    opacity: 0.62;
+}
+
+/* "click anywhere to enable sound". Same black-and-white terms as the rest of
+   the screen, and it fades out for good on the first press rather than being
+   yanked, so it doesn't blink out from under the cursor. */
+.main-menu-audio-hint {
+    margin-top: 18px;
+    text-align: center;
+    font-size: clamp(10px, 1.1vw, 12px);
+    color: #000;
+    opacity: 0.55;
+    letter-spacing: 0.06em;
+    pointer-events: none;
+    transition: opacity 320ms ease;
+}
+
+.main-menu-audio-hint.mm-hint-gone {
+    opacity: 0;
+}
+
+/* The build number, in the corner where a build number goes. `fixed` rather
+   than absolute: this screen scrolls when the window is short, and a version
+   tag that scrolls away with the content isn't in the corner any more. */
+.main-menu-version {
+    position: fixed;
+    right: 12px;
+    bottom: 10px;
+    font-size: clamp(10px, 1.1vw, 12px);
+    color: #000;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* ---------------------------------------------------------------
+   The intro cutscene. Black screen, the video, and then the video
+   in eleven pieces with Corg coming out of the middle of it.
+
+   Sits above the title screen (which is 1000002) because it is
+   what the title screen hands off to.
+   --------------------------------------------------------------- */
+#intro-video-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000003;
+    background: #000;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    user-select: none;
+    opacity: 1;
+    /* endIntro()'s INTRO_FADE_MS is this duration. Keep them together. */
+    transition: opacity 0.6s ease;
+}
+#intro-video-screen.open { display: flex; }
+#intro-video-screen.fading { opacity: 0; }
+
+/* The stage is exactly the video's letterboxed box, not the screen: the shards
+   are cut from the frame, so they have to be measured against the frame. */
+.intro-stage {
+    position: relative;
+    line-height: 0;
+}
+
+.intro-video {
+    display: block;
+    max-width: 100vw;
+    max-height: 100vh;
+}
+/* The instant the shards exist the whole frame does not, so the picture is
+   never both intact and broken. visibility, not display: the stage keeps the
+   video's size, which is what the shards are laid out against. */
+.intro-video.broken { visibility: hidden; }
+
+.intro-shards {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+/* Each shard is its own piece of the held frame: a canvas the size of that
+   piece's bounding box, positioned where the piece was, clipped to the crack
+   pattern. Sized and placed from introSmash(). */
+.intro-shard {
+    position: absolute;
+    will-change: transform, opacity;
+}
+.intro-shard-face {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+/* Only when there was no frame to cut up. Dark, because the scene is on black
+   and a white pane appearing out of nowhere is worse than no pane. */
+.intro-shard-blank { background: rgba(150, 170, 190, 0.22); }
+
+/* Corg comes through the middle of the frame, towards you. */
+.intro-corg {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: clamp(150px, 24vw, 300px);
+    transform: translate(-50%, -50%) scale(0.12);
+    opacity: 0;
+    pointer-events: none;
+}
+.intro-corg img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.55));
+}
+.intro-corg.burst { animation: introCorgBurst 620ms cubic-bezier(0.16, 0.9, 0.3, 1.15) forwards; }
+
+/* Overshoot then settle: he arrives faster than he stops, which is what makes
+   it read as coming *through* something rather than fading in. */
+@keyframes introCorgBurst {
+    0%   { transform: translate(-50%, -50%) scale(0.12) rotate(-14deg); opacity: 0; }
+    30%  { opacity: 1; }
+    60%  { transform: translate(-50%, -50%) scale(1.14) rotate(5deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* The desktop bubble, borrowed. It hangs off the dog's shoulder rather than
+   .guggy-bubble's default left-10px, because here the dog is centred. */
+.intro-bubble {
+    /* Clear of his ears: corg.png carries a lot of transparent margin, so the
+       bubble has to sit above the *box* to sit above the dog. */
+    left: 56%;
+    bottom: 92%;
+    width: min(210px, 46vw);
+    text-align: center;
+    pointer-events: none;
+}
+.intro-bubble .guggy-bubble-tail { left: 24px; }
+
+.intro-skip {
+    position: absolute;
+    right: 16px;
+    bottom: 14px;
+    font-family: Tahoma, 'MS Sans Serif', Arial, sans-serif;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.45);
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #intro-video-screen { transition: none; }
+    /* The break still happens — it's the point of the scene — but Corg simply
+       appears at his final size instead of being flung at you. */
+    .intro-corg.burst { animation: none; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ---------------------------------------------------------------
+   CORG OS Setup — the Windows-Setup pastiche where Corg
+   introduces himself and then sings. Not in the flow any more (the
+   intro cutscene above replaced it); kept, like the markup.
+   --------------------------------------------------------------- */
+#setup-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000002;
+    background: #241a63;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    user-select: none;
+}
+#setup-screen.open { display: flex; }
+
+.setup-window {
+    width: min(760px, 88vw);
+    height: min(560px, 78vh);
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, #d7e8f7, #b9d5ee);
+    border: 1px solid #6f9dc9;
+    border-radius: 6px 6px 4px 4px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5) inset, 0 18px 60px rgba(0, 0, 0, 0.55);
+    padding: 4px;
+    box-sizing: border-box;
+    opacity: 0;
+    transform: scale(0.97);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+#setup-screen.open .setup-window { opacity: 1; transform: scale(1); }
+
+.setup-titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 4px 6px;
+    font-size: 12px;
+    color: #12325a;
+}
+.setup-title { display: flex; align-items: center; gap: 6px; }
+.setup-title img { width: 14px; height: 14px; }
+
+.setup-controls { display: flex; gap: 2px; }
+.setup-ctl {
+    width: 26px; height: 17px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: #12325a;
+    background: linear-gradient(180deg, #f2f8fd, #cfe1f2);
+    border: 1px solid #8fb4d6;
+    border-radius: 3px;
+}
+.setup-ctl-close { background: linear-gradient(180deg, #f08a86, #d33a2f); border-color: #b32e24; color: #fff; }
+
+.setup-body {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 26px 30px 20px;
+    box-sizing: border-box;
+    background: #241a63;
+    border: 1px solid #6f9dc9;
+    color: #fff;
+    overflow: hidden;
+}
+
+.setup-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.setup-logo img { width: 42px; height: 42px; image-rendering: pixelated; }
+.setup-logo span { font-size: 34px; font-weight: 300; letter-spacing: 1px; }
+
+.setup-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    width: 100%;
+    min-height: 0;
+}
+
+#setup-guggy {
+    max-height: 190px;
+    max-width: 60%;
+    object-fit: contain;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+#setup-guggy.visible { opacity: 1; transform: translateY(0); }
+#setup-guggy.singing { animation: setupGuggyBop 0.55s ease-in-out infinite alternate; }
+
+@keyframes setupGuggyBop {
+    from { transform: translateY(0) rotate(-2.5deg); }
+    to   { transform: translateY(-10px) rotate(2.5deg); }
+}
+
+.setup-subtitle {
+    min-height: 3.2em;
+    max-width: 82%;
+    text-align: center;
+    font-size: clamp(13px, 1.5vw, 17px);
+    line-height: 1.55;
+    color: #eaf1ff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+.setup-install {
+    display: none;
+    margin: 4px 0 14px;
+    padding: 6px 34px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #000;
+    background: linear-gradient(180deg, #fbfbfb, #e3e3e3);
+    border: 1px solid #8a8a8a;
+    border-radius: 3px;
+    cursor: pointer;
+}
+.setup-install.visible { display: block; animation: setupFadeUp 0.45s ease both; }
+.setup-install:hover { background: linear-gradient(180deg, #fff, #d6e9fa); border-color: #4a90d9; }
+
+@keyframes setupFadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.setup-footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: #d5dcf5;
+}
+.setup-repair { text-decoration: underline; text-underline-offset: 2px; }
+.setup-copy { color: #b9c2e6; }
+
+/* ---------------------------------------------------------------
+   Corgpilot — CORGOS 11's assistant.
+
+   The window is a 95 window like every other window here (titlebar,
+   close button, the shared drag/resize), and everything below the
+   titlebar is Fluent: a white panel, rounded bubbles, a pill composer,
+   the accent blue. That mismatch is the same one the desktop already
+   has — 11's theme restyles the 95 chrome rather than replacing it —
+   and Corgpilot only ever appears while that theme is on, so in
+   practice the titlebar is wearing 11's own paint.
+
+   Everything below is in service of one impression: that a real
+   assistant is sitting in this window. The header has a live dot and a
+   model name, the panel grows a sweeping progress bar while it is
+   working, answers arrive as a card with a reasoning drawer, a body,
+   source cards, a token footer and a hover-revealed action bar, and the
+   composer is one pill with a round send button that becomes a stop
+   button. See corgpilot.js: the panel's whole job is to look like
+   something is being generated.
+   --------------------------------------------------------------- */
+.corgpilot-window {
+    --cp-accent: #0067c0;
+    --cp-accent-2: #7a4ddb;
+    --cp-ink: #1b1b1f;
+    --cp-dim: #61616b;
+    --cp-line: rgba(0, 0, 0, 0.09);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: #f5f6f9 !important;
+    overflow: hidden;
+}
+
+/* Header ------------------------------------------------------- */
+.cp-header {
+    position: relative;
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; background: #fff;
+    border-bottom: 1px solid var(--cp-line);
+}
+.cp-header-avatar {
+    width: 30px; height: 30px; flex: 0 0 auto;
+    border-radius: 9px; background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+}
+.cp-header-meta { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.cp-header-title { font-size: 13px; font-weight: 600; color: var(--cp-ink); line-height: 1.15; }
+.cp-header-sub {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10.5px; color: var(--cp-dim); line-height: 1.15;
+}
+/* The little green dot every "we are online" header has. */
+.cp-live {
+    width: 6px; height: 6px; border-radius: 50%; background: #3ba55d;
+    box-shadow: 0 0 0 0 rgba(59, 165, 93, 0.55);
+    animation: cpPulse 2.4s ease-out infinite;
+}
+@keyframes cpPulse {
+    70% { box-shadow: 0 0 0 5px rgba(59, 165, 93, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(59, 165, 93, 0); }
+}
+/* The model picker, in the header where the real one keeps it. */
+.cp-model {
+    display: flex; align-items: center; gap: 5px;
+    margin: 1px 0 0 -4px; padding: 1px 6px 1px 4px; cursor: pointer;
+    background: none; border: 1px solid transparent; border-radius: 7px;
+    font-family: inherit; font-size: 10.5px; color: var(--cp-dim); line-height: 1.3;
+}
+.cp-model:hover { background: rgba(0, 0, 0, 0.05); border-color: var(--cp-line); color: var(--cp-ink); }
+.cp-model-caret { font-size: 10px; opacity: 0.85; }
+
+.cp-model-menu {
+    position: absolute; top: 46px; left: 10px; z-index: 30;
+    width: 260px; max-width: calc(100% - 20px); padding: 4px;
+    background: #fff; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 10px;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.18);
+    animation: cpRowIn 0.14s ease-out;
+}
+.cp-model-item {
+    display: flex; align-items: flex-start; gap: 7px; width: 100%;
+    padding: 7px 8px; cursor: pointer; text-align: left;
+    background: none; border: 0; border-radius: 7px; font-family: inherit;
+}
+.cp-model-item:hover { background: rgba(0, 0, 0, 0.05); }
+.cp-model-item.cp-on { background: rgba(0, 103, 192, 0.09); }
+.cp-model-tick { flex: 0 0 12px; font-size: 11px; color: var(--cp-accent); line-height: 1.5; }
+.cp-model-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cp-model-name {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; color: var(--cp-ink);
+}
+.cp-model-tag {
+    padding: 0 6px; border-radius: 8px;
+    background: rgba(0, 103, 192, 0.12); color: var(--cp-accent);
+    font-size: 9.5px; font-weight: 600; letter-spacing: 0.2px;
+}
+.cp-model-blurb { font-size: 10.5px; color: var(--cp-dim); }
+
+/* Something the app did, rather than something either of you said. */
+.cp-note {
+    align-self: center; padding: 3px 10px; border-radius: 10px;
+    background: rgba(0, 0, 0, 0.05); color: var(--cp-dim); font-size: 10.5px;
+}
+
+.cp-icon-btn {
+    margin-left: auto; flex: 0 0 auto;
+    width: 28px; height: 28px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: none; border: 0; border-radius: 8px; cursor: pointer;
+    font-size: 13px; color: var(--cp-dim); line-height: 1;
+}
+.cp-icon-btn:hover { background: rgba(0, 0, 0, 0.06); color: var(--cp-ink); }
+
+/* The sweep under the header while a reply is in flight — the one
+   piece of chrome that says "working" without saying a word. */
+.corgpilot-window.cp-working .cp-header::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cp-accent), var(--cp-accent-2), transparent);
+    background-size: 200% 100%;
+    animation: cpSweep 1.5s linear infinite;
+}
+@keyframes cpSweep { to { background-position: -200% 0; } }
+
+/* Transcript --------------------------------------------------- */
+/* flex:1 + min-height:0 so it scrolls instead of pushing the composer
+   off the bottom of the window. */
+.cp-log {
+    flex: 1; min-height: 0; overflow-y: auto;
+    padding: 14px 12px 6px;
+    display: flex; flex-direction: column; gap: 14px;
+    background: #f5f6f9;
+    scrollbar-width: thin; scrollbar-color: rgba(0, 0, 0, 0.22) transparent;
+}
+.cp-log::-webkit-scrollbar { width: 8px; }
+.cp-log::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
+.cp-log::-webkit-scrollbar-track { background: transparent; }
+
+.cp-row {
+    display: flex; gap: 8px; align-items: flex-start; max-width: 100%;
+    animation: cpRowIn 0.22s ease-out;
+}
+@keyframes cpRowIn { from { opacity: 0; transform: translateY(6px); } }
+.cp-row.cp-user { justify-content: flex-end; }
+.cp-col { display: flex; flex-direction: column; min-width: 0; max-width: 88%; }
+.cp-user .cp-col { align-items: flex-end; max-width: 84%; }
+.cp-avatar {
+    width: 26px; height: 26px; flex: 0 0 auto; margin-top: 16px;
+    border-radius: 8px; background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16);
+}
+.cp-msghead {
+    display: flex; align-items: baseline; gap: 6px;
+    margin: 0 0 3px 2px; font-size: 10.5px; color: var(--cp-dim);
+}
+.cp-name { font-weight: 600; color: #3a3a44; }
+
+.cp-bubble {
+    position: relative; max-width: 100%;
+    padding: 10px 13px;
+    border-radius: 12px;
+    font-size: 13px; line-height: 1.58; color: var(--cp-ink);
+    overflow-wrap: anywhere;
+}
+.cp-user .cp-bubble {
+    background: linear-gradient(135deg, var(--cp-accent), #1a7ad4);
+    color: #fff;
+    border-radius: 14px 14px 3px 14px;
+    box-shadow: 0 1px 4px rgba(0, 103, 192, 0.28);
+}
+.cp-bot .cp-bubble {
+    background: #fff;
+    border: 1px solid var(--cp-line);
+    border-radius: 3px 14px 14px 14px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.cp-bubble p { margin: 0 0 9px; }
+.cp-bubble p:last-child { margin-bottom: 0; }
+.cp-body > *:last-child { margin-bottom: 0; }
+.cp-bubble h4 {
+    margin: 12px 0 6px; font-size: 13px; font-weight: 600; color: var(--cp-ink);
+}
+.cp-bubble ul, .cp-bubble ol { margin: 0 0 9px; padding-left: 20px; }
+.cp-bubble li { margin: 4px 0; }
+.cp-bubble strong { font-weight: 600; }
+.cp-inlinecode {
+    padding: 1px 5px; border-radius: 4px;
+    background: rgba(0, 0, 0, 0.06); border: 1px solid rgba(0, 0, 0, 0.06);
+    font-family: 'Cascadia Code', Consolas, 'Courier New', monospace; font-size: 11.5px;
+}
+
+/* Nothing the stream hasn't reached yet is on screen: corgpilot.js
+   builds the whole answer up front and un-pends each piece as it starts
+   writing into it. */
+.cp-pending { display: none !important; }
+
+/* The caret, on whichever element is being written into — it travels
+   with the cursor rather than sitting at the bottom of the bubble. */
+.cp-caret::after {
+    content: '';
+    display: inline-block; width: 7px; height: 1em;
+    margin-left: 2px; vertical-align: text-bottom;
+    background: var(--cp-accent);
+    animation: cpCaret 1s steps(1) infinite;
+}
+.cp-codeblock .cp-caret::after { background: #e6e6ea; }
+@keyframes cpCaret { 50% { opacity: 0; } }
+
+/* The dog, where the word used to be. corgpilot.js does this itself
+   once a line has finished typing; the shared img.corg-word rules size
+   it, this only keeps it off the baseline. */
+.cp-bubble img.cp-corg, .cp-think img.cp-corg, .cp-source img.cp-corg {
+    vertical-align: -0.25em;
+}
+
+/* The reasoning drawer ----------------------------------------- */
+.cp-think {
+    margin: -2px 0 9px;
+    border: 1px solid var(--cp-line); border-radius: 9px;
+    background: #fafafc; overflow: hidden;
+}
+.cp-think-head {
+    display: flex; align-items: center; gap: 6px; width: 100%;
+    padding: 6px 9px; cursor: pointer;
+    background: none; border: 0; text-align: left;
+    font-family: inherit; font-size: 11.5px; color: var(--cp-dim);
+}
+.cp-think-head:hover { background: rgba(0, 0, 0, 0.03); color: var(--cp-ink); }
+.cp-think-caret { display: inline-block; transition: transform 0.15s ease; font-size: 13px; }
+.cp-think.open .cp-think-caret { transform: rotate(90deg); }
+.cp-think-body { display: none; padding: 2px 10px 9px 22px; }
+.cp-think.open .cp-think-body { display: block; }
+.cp-think-body p {
+    margin: 0 0 6px; font-size: 11.5px; line-height: 1.5;
+    color: #6a6a76; font-style: italic;
+}
+
+/* Code, tables and the other block shapes ---------------------- */
+.cp-codeblock {
+    margin: 9px 0; border-radius: 9px; overflow: hidden;
+    background: #1e1e24; border: 1px solid rgba(0, 0, 0, 0.35);
+}
+.cp-codebar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 5px 10px; background: #26262e;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+.cp-codelang {
+    font-size: 10.5px; letter-spacing: 0.4px; text-transform: uppercase;
+    color: #9a9aa8;
+}
+.cp-codecopy {
+    padding: 2px 8px; cursor: pointer;
+    background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 5px; color: #d7d7e0;
+    font-family: inherit; font-size: 10.5px;
+}
+.cp-codecopy:hover { background: rgba(255, 255, 255, 0.16); color: #fff; }
+.cp-codeblock pre {
+    margin: 0; padding: 9px 11px; overflow-x: auto;
+    background: none; color: #e6e6ea;
+}
+.cp-bubble pre code {
+    font-family: 'Cascadia Code', Consolas, 'Courier New', monospace;
+    font-size: 11.5px; line-height: 1.55; white-space: pre;
+}
+
+.cp-tablewrap { margin: 9px 0; overflow-x: auto; border-radius: 9px; border: 1px solid var(--cp-line); }
+.cp-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.cp-table th, .cp-table td {
+    padding: 6px 9px; text-align: left;
+    border-bottom: 1px solid var(--cp-line);
+}
+.cp-table th { background: #f3f4f8; font-weight: 600; color: #3a3a44; }
+.cp-table tr:last-child td { border-bottom: 0; }
+
+.cp-quote {
+    margin: 9px 0; padding: 6px 0 6px 11px;
+    border-left: 3px solid var(--cp-accent);
+    color: #45454f; font-style: italic;
+}
+
+.cp-callout {
+    display: flex; gap: 9px; align-items: flex-start;
+    margin: 9px 0; padding: 9px 11px; border-radius: 9px;
+    background: #eef4fc; border: 1px solid rgba(0, 103, 192, 0.16);
+}
+.cp-callout-icon { flex: 0 0 auto; font-size: 14px; line-height: 1.4; }
+.cp-callout-text { min-width: 0; }
+
+.cp-verse {
+    margin: 9px 0; padding-left: 2px;
+    font-style: italic; line-height: 1.9; color: #35353f;
+}
+
+/* Sources, stats, actions -------------------------------------- */
+.cp-sources { margin-top: 12px; padding-top: 9px; border-top: 1px solid var(--cp-line); }
+.cp-sources-label {
+    margin-bottom: 6px; font-size: 10.5px; font-weight: 600;
+    letter-spacing: 0.4px; text-transform: uppercase; color: #8a8a95;
+}
+.cp-source-list { display: flex; flex-direction: column; gap: 5px; }
+.cp-source {
+    display: flex; align-items: center; gap: 8px;
+    padding: 5px 9px; border-radius: 8px;
+    background: #f4f7fc; border: 1px solid rgba(0, 103, 192, 0.14);
+}
+.cp-source-num {
+    flex: 0 0 auto; width: 17px; height: 17px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--cp-accent); color: #fff; font-size: 10px; font-weight: 600;
+}
+.cp-source-text { display: flex; flex-direction: column; min-width: 0; }
+.cp-source-title { font-size: 11.5px; color: #2b4d78; }
+.cp-source-host { font-size: 10px; color: #7d8592; }
+
+.cp-stats { margin-top: 8px; font-size: 10px; color: #9a9aa5; }
+
+/* Hidden until you hover the answer, the way they all are. */
+.cp-actions {
+    display: flex; gap: 4px; margin-top: 6px;
+    opacity: 0; transition: opacity 0.15s ease;
+}
+.cp-bot .cp-bubble:hover .cp-actions,
+.cp-actions:focus-within { opacity: 1; }
+.cp-action {
+    display: flex; align-items: center; gap: 4px;
+    padding: 3px 7px; cursor: pointer;
+    background: none; border: 1px solid transparent; border-radius: 6px;
+    font-family: inherit; font-size: 11px; color: var(--cp-dim); line-height: 1.3;
+}
+.cp-action:hover { background: rgba(0, 0, 0, 0.05); border-color: var(--cp-line); color: var(--cp-ink); }
+.cp-action.cp-on { background: rgba(0, 103, 192, 0.12); border-color: rgba(0, 103, 192, 0.3); color: var(--cp-accent); }
+.cp-action.cp-done { color: #2f8f4e; }
+.cp-action-icon { font-size: 12px; line-height: 1; }
+
+/* The three dots, while it thinks ------------------------------ */
+.cp-bubble.cp-typingbubble { padding: 12px 14px; }
+.cp-typing { display: flex; gap: 4px; align-items: center; }
+.cp-typing span {
+    width: 6px; height: 6px; border-radius: 50%; background: #b3b3c0;
+    animation: cpBounce 1.1s ease-in-out infinite;
+}
+.cp-typing span:nth-child(2) { animation-delay: 0.15s; }
+.cp-typing span:nth-child(3) { animation-delay: 0.3s; }
+@keyframes cpBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+    30% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* The empty state ---------------------------------------------- */
+.cp-welcome {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 22px 6px 8px; text-align: center;
+    animation: cpRowIn 0.3s ease-out;
+}
+.cp-welcome-avatar {
+    width: 60px; height: 60px; margin-bottom: 10px;
+    border-radius: 18px; background: #fff;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+.cp-welcome-title {
+    font-size: 19px; font-weight: 600; letter-spacing: -0.2px;
+    background: linear-gradient(90deg, var(--cp-accent), var(--cp-accent-2));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: var(--cp-accent);
+}
+.cp-welcome-sub { margin: 5px 0 16px; max-width: 340px; font-size: 12px; color: var(--cp-dim); }
+.cp-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+.cp-card {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 10px; cursor: pointer; text-align: left;
+    background: #fff; border: 1px solid var(--cp-line); border-radius: 10px;
+    font-family: inherit;
+    transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+.cp-card:hover {
+    border-color: rgba(0, 103, 192, 0.45); transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
+}
+.cp-card-icon { flex: 0 0 auto; font-size: 15px; line-height: 1.2; }
+.cp-card-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cp-card-title { font-size: 12px; font-weight: 600; color: var(--cp-ink); }
+.cp-card-sub { font-size: 10.5px; color: var(--cp-dim); }
+
+/* The stall line. Hidden until corgpilot.js turns it on, then a
+   spinner and whatever it claims to be doing. */
+.cp-status {
+    display: none; align-items: center; gap: 7px;
+    padding: 2px 16px 6px; color: #5c5c66; font-size: 11.5px;
+}
+.cp-status.on { display: flex; }
+.cp-spinner {
+    width: 11px; height: 11px; flex: 0 0 auto; border-radius: 50%;
+    border: 2px solid rgba(0, 103, 192, 0.25); border-top-color: var(--cp-accent);
+    animation: cpSpin 0.7s linear infinite;
+}
+@keyframes cpSpin { to { transform: rotate(360deg); } }
+.cp-status-text::after {
+    content: '...';
+    animation: cpDots 1.2s steps(4) infinite;
+}
+@keyframes cpDots { 0% { opacity: 0.25; } 50% { opacity: 1; } 100% { opacity: 0.25; } }
+
+/* Follow-ups --------------------------------------------------- */
+.cp-suggestions { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 12px 8px; }
+.cp-chip {
+    padding: 5px 11px; cursor: pointer;
+    background: #fff; border: 1px solid rgba(0, 0, 0, 0.12); border-radius: 14px;
+    font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 11.5px; color: var(--cp-ink);
+    animation: cpRowIn 0.2s ease-out;
+}
+.cp-chip:hover { border-color: var(--cp-accent); color: var(--cp-accent); background: #f4f8fd; }
+
+/* Composer ----------------------------------------------------- */
+.cp-composer {
+    display: flex; gap: 8px; align-items: center;
+    padding: 10px 12px 6px; background: #f5f6f9;
+    border-top: 1px solid var(--cp-line);
+}
+/* One pill with the button inside it, rather than a box and a button
+   next to each other — that swap alone is most of the difference
+   between a 2010 chat box and a 2024 one. */
+.cp-inputwrap {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 5px 4px 14px;
+    background: #fff; border: 1px solid rgba(0, 0, 0, 0.16); border-radius: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.cp-inputwrap:focus-within {
+    border-color: var(--cp-accent);
+    box-shadow: 0 0 0 2px rgba(0, 103, 192, 0.16);
+}
+.cp-input {
+    flex: 1; min-width: 0; padding: 7px 0;
+    background: none; border: 0; outline: none;
+    font-family: 'Segoe UI', Tahoma, sans-serif; font-size: 13px; color: var(--cp-ink);
+}
+.cp-send {
+    flex: 0 0 auto; width: 30px; height: 30px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: 0; border-radius: 50%;
+    background: linear-gradient(135deg, var(--cp-accent), var(--cp-accent-2));
+    color: #fff;
+}
+.cp-send:hover { filter: brightness(1.1); }
+/* Mid-answer the same button stops the generation, so it stops looking
+   like the thing that starts one. */
+.cp-send.cp-stopping {
+    background: #2b2b33; color: #fff;
+}
+
+.cp-disclaimer {
+    padding: 0 12px 10px; text-align: center;
+    color: #6b6b75; font-size: 10.5px;
+}
+
+@media (max-width: 520px) {
+    .cp-cards { grid-template-columns: 1fr; }
+    .cp-col, .cp-user .cp-col { max-width: 94%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cp-caret::after, .cp-status-text::after, .cp-live,
+    .cp-typing span, .cp-spinner, .cp-row, .cp-welcome, .cp-chip,
+    .corgpilot-window.cp-working .cp-header::after { animation: none; }
+    .cp-spinner { border-top-color: rgba(0, 103, 192, 0.25); }
+}
+
+/* ---------------------------------------------------------------
+   HOPECON_Tracker.exe — see hopecon.js.
+
+   Built like a page somebody made for one fact they care about too
+   much: a chart, a band marked on it, a clip, a log, and a line at the
+   bottom admitting nobody official is behind it. Deliberately plain —
+   no gauges, no gradients, nothing pulsing. The chart is the artwork
+   and everything else gets out of its way.
+
+   VCR OSD Mono for the numbers and the labels, which is the font this
+   corner of the internet writes its overlays in.
+   --------------------------------------------------------------- */
+.hopecon-window {
+    --hc-ink: #d9d5cc;
+    --hc-dim: #8b857a;
+    --hc-line: #33302b;
+    --hc-hot: #ffb43c;
+    background: #16150f !important;
+    color: var(--hc-ink);
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    overflow: hidden;
+}
+
+.hc-body {
+    flex: 1; min-height: 0;
+    display: flex; gap: 14px; padding: 14px;
+    background: #16150f;
+}
+
+.hc-heading {
+    margin-bottom: 5px;
+    font-family: 'VCR OSD Mono', Consolas, monospace;
+    font-size: 11px; letter-spacing: 2px; color: var(--hc-dim);
+}
+
+/* The chart --------------------------------------------------- */
+.hc-chart-col { flex: 0 0 240px; min-width: 0; display: flex; flex-direction: column; }
+/* The box carries the chart's own 1:2 aspect ratio and the image fills it
+   exactly, corner to corner. That is what lets the band markers in hopecon.js
+   be plain percentages: letterbox the image inside a box of some other shape
+   and every marker drifts off its band by however much empty space ends up
+   above it. If the window is squeezed too short for the full ratio the box
+   squashes rather than letterboxing — the picture gets a little short, and the
+   markers stay exactly where they belong. */
+.hc-chart {
+    position: relative; width: 100%; max-height: 100%;
+    aspect-ratio: 1024 / 2048; overflow: hidden;
+    border: 1px solid var(--hc-line); background: #000;
+}
+.hc-chart-img { display: block; width: 100%; height: 100%; }
+
+/* One box per band of the artwork. The four we aren't on are dimmed
+   out; the one we are on is left alone and outlined. */
+.hc-band {
+    position: absolute; left: 0; right: 0;
+    background: rgba(12, 11, 8, 0.72);
+    transition: background 0.15s ease;
+}
+.hc-chart:hover .hc-band { background: rgba(12, 11, 8, 0.45); }
+.hc-band-on, .hc-chart:hover .hc-band-on {
+    background: none;
+    outline: 2px solid var(--hc-hot);
+    outline-offset: -2px;
+}
+.hc-band-tag {
+    position: absolute; right: 0; bottom: 0;
+    padding: 1px 6px;
+    background: var(--hc-hot); color: #16150f;
+    font-family: 'VCR OSD Mono', Consolas, monospace;
+    font-size: 10px; letter-spacing: 1px;
+}
+
+/* The readout -------------------------------------------------- */
+.hc-side { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+
+.hc-readout {
+    padding: 10px 12px; margin-bottom: 6px;
+    border: 1px solid var(--hc-line); background: #1b1a13;
+}
+.hc-readout-top {
+    display: flex; align-items: baseline; gap: 10px;
+    font-family: 'VCR OSD Mono', Consolas, monospace;
+}
+.hc-readout-word { font-size: 22px; letter-spacing: 4px; color: var(--hc-ink); }
+.hc-level { font-size: 46px; line-height: 1; color: var(--hc-hot); }
+.hc-level-name {
+    margin-top: 4px;
+    font-family: 'VCR OSD Mono', Consolas, monospace;
+    font-size: 13px; letter-spacing: 1.5px; color: var(--hc-hot);
+}
+.hc-level-note { margin-top: 5px; font-size: 12px; line-height: 1.5; color: var(--hc-ink); }
+
+/* The clip ----------------------------------------------------- */
+.hc-broadcast { border: 1px solid var(--hc-line); background: #000; aspect-ratio: 1280 / 546; overflow: hidden; }
+.hc-video { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.hc-buttons { display: flex; gap: 6px; margin: 6px 0 8px; }
+.hc-btn {
+    font-family: 'Segoe UI', Tahoma, sans-serif !important;
+    font-size: 11px !important; padding: 3px 10px !important;
+}
+.hc-btn:disabled { opacity: 0.6; }
+
+/* The log ------------------------------------------------------ */
+.hc-log {
+    flex: 1; min-height: 70px; overflow-y: auto;
+    padding: 7px 9px; border: 1px solid var(--hc-line); background: #1b1a13;
+    font-size: 11.5px; line-height: 1.6;
+    scrollbar-width: thin; scrollbar-color: #3b382f transparent;
+}
+.hc-log::-webkit-scrollbar { width: 8px; }
+.hc-log::-webkit-scrollbar-thumb { background: #3b382f; }
+.hc-log::-webkit-scrollbar-track { background: transparent; }
+.hc-log-line { display: flex; gap: 9px; color: var(--hc-ink); }
+.hc-log-date {
+    flex: 0 0 52px;
+    font-family: 'VCR OSD Mono', Consolas, monospace;
+    font-size: 11px; color: var(--hc-dim);
+}
+.hc-log-new .hc-log-date { color: var(--hc-hot); }
+
+.hc-check { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+.hc-checked { flex: 1; min-width: 0; font-size: 11px; color: var(--hc-dim); }
+
+.hc-footer {
+    padding: 5px 12px; text-align: center;
+    background: #1b1a13; border-top: 1px solid var(--hc-line);
+    font-size: 10.5px; color: var(--hc-dim);
+}
+
+/* Narrow: the chart goes on top and stops eating the height. */
+@media (max-width: 720px) {
+    .hc-body { flex-direction: column; overflow-y: auto; }
+    .hc-chart-col { flex: 0 0 auto; }
+    .hc-chart { flex: 0 0 auto; height: 300px; }
+    .hc-level { font-size: 38px; }
+}
+
+/* ============================================================
+   Per-OS mouse cursors
+   ============================================================
+   CORGOS 95 and XP share the win95/98 set, CORGOS 7 uses the Windows 7
+   (Vista) set; CORGOS 11 keeps the host system's own cursors. Both sets are
+   public domain — see THIRD_PARTY.md.
+
+   Theme selectors: win95 is the class-less default, so "95 or XP" is
+   `body:not(.win7-theme):not(.win11-theme)`. Everything here is !important
+   so it beats the per-component `cursor:` declarations scattered above
+   (some of which are id-scoped) without having to restate their selectors.
+
+   Animated .ani cursors (Busy / Working In Background) aren't supported by
+   browsers, so `wait` / `progress` fall back to the static hourglass on
+   95/XP and to the system cursor on 7.
+
+   The static cursor files are served with a .ico extension even though the
+   bytes are actual CUR-format icon data. Browsers detect the format from the
+   file's own header, not the extension, so this renders identically — but
+   .ico is a MIME type every static host (including GitHub Pages) recognizes,
+   whereas .cur isn't, and a cursor served as application/octet-stream is
+   silently ignored (falling through to the plain cursor keyword after the
+   comma). The original .cur files are left in cursor/ untouched.
+   ============================================================ */
+
+/* ---------- CORGOS 95 / CORGOS XP ---------- */
+body:not(.win7-theme):not(.win11-theme),
+body:not(.win7-theme):not(.win11-theme) * {
+    cursor: url('cursor/win-95-xp/arrow.ico'), auto !important;
+}
+body:not(.win7-theme):not(.win11-theme) :is(
+    a, button, summary, select, label, [onclick],
+    input[type="button"], input[type="submit"], input[type="checkbox"], input[type="radio"], input[type="range"],
+    .win98-button, .desktop-icon, .taskbar-item, .win95-program-item, .win11-app-item,
+    .win98-tab, .inventory-item, .mine-cell, .paint-swatch, .corg-console-submit, .guggy-btn, .popup-content a, .loginxp-user, .close-btn
+) {
+    cursor: url('cursor/win-95-xp/Cursor_15.ico'), pointer !important;
+}
+body:not(.win7-theme):not(.win11-theme) #gug-can {
+    cursor: url('cursor/win-95-xp/Cursor_15.ico'), pointer !important;
+}
+body:not(.win7-theme):not(.win11-theme) :is(
+    input[type="text"], input[type="password"], input[type="search"], input[type="email"],
+    input[type="number"], input:not([type]), textarea, .win98-input, .corg-console-input
+) {
+    cursor: url('cursor/win-95-xp/beam-fixed.ico'), text !important;
+}
+body:not(.win7-theme):not(.win11-theme) :is(
+    .movable-resizable .win98-titlebar, .popup-ad .win98-titlebar, .guggy-icon-group
+) {
+    cursor: url('cursor/win-95-xp/Cursor_10.ico'), move !important;
+}
+body:not(.win7-theme):not(.win11-theme) :is(button:disabled, [disabled], .disabled) {
+    cursor: url('cursor/win-95-xp/Cursor_11.ico'), not-allowed !important;
+}
+body:not(.win7-theme):not(.win11-theme) #paint-canvas {
+    cursor: url('cursor/win-95-xp/Cursor_14.ico'), crosshair !important;
+}
+body:not(.win7-theme):not(.win11-theme) .window-resize-grip {
+    cursor: url('cursor/win-95-xp/Cursor_6.ico'), nwse-resize !important;
+}
+body:not(.win7-theme):not(.win11-theme) :is(#shutdown-overlay, #shutdown-overlay *) {
+    cursor: url('cursor/win-95-xp/Cursor_3.ico'), wait !important;
+}
+
+/* ---------- CORGOS 7 ---------- */
+body.win7-theme,
+body.win7-theme * {
+    cursor: url('cursor/windows-7/Windows%207%20(Vista)%20Normal%20Select.ico'), auto !important;
+}
+body.win7-theme :is(
+    a, button, summary, select, label, [onclick],
+    input[type="button"], input[type="submit"], input[type="checkbox"], input[type="radio"], input[type="range"],
+    .win98-button, .desktop-icon, .taskbar-item, .win95-program-item, .win11-app-item,
+    .win98-tab, .inventory-item, .mine-cell, .paint-swatch, .corg-console-submit, .guggy-btn, .popup-content a, .loginxp-user, .close-btn
+) {
+    cursor: url('cursor/windows-7/Windows%207%20(Vista)%20Link%20Select.ico'), pointer !important;
+}
+body.win7-theme #gug-can {
+    cursor: url('cursor/windows-7/Windows%207%20(Vista)%20Link%20Select.ico'), pointer !important;
+}
+body.win7-theme :is(
+    input[type="text"], input[type="password"], input[type="search"], input[type="email"],
+    input[type="number"], input:not([type]), textarea, .win98-input, .corg-console-input
+) {
+    cursor: url('cursor/windows-7/Windows%207%20(Vista)%20Text%20Select.ico'), text !important;
+}
+body.win7-theme :is(
+    .movable-resizable .win98-titlebar, .popup-ad .win98-titlebar, .guggy-icon-group
+) {
+    cursor: url('cursor/windows-7/Windows%207%20(Vista)%20Move.ico'), move !important;
+}
+body.win7-theme :is(button:disabled, [disabled], .disabled) {
+    cursor: url('cursor/windows-7/Windows%207%20(Vista)%20Unavailable.ico'), not-allowed !important;
+}
+body.win7-theme #paint-canvas {
+    cursor: url('cursor/windows-7/Windows%207%20(Vista)%20Precision%20Select.ico'), crosshair !important;
+}
+body.win7-theme .window-resize-grip {
+    cursor: url('cursor/windows-7/Windows%207%20(Vista)%20Diagonal%20Resize%201.ico'), nwse-resize !important;
+}
+
+/* ---------- busy / progress ----------
+   The two animated Windows 7 cursors were .ani, which no browser can use;
+   scratch/ani2gif.py re-packs them as GIFs (plus a first-frame .cur for
+   browsers that won't take a GIF cursor at all). Firefox animates a GIF
+   cursor; Chrome, Edge and Safari show the first frame only — still the right
+   picture, just not spinning. GIFs carry no hotspot, hence the explicit
+   coordinates, taken from the .ani frames.
+
+   Last in the file on purpose: these share specificity with the pointer/text
+   rules above, so source order is what makes a busy window win. */
+body.win7-theme :is(#shutdown-overlay, #shutdown-overlay *) {
+    cursor: url('cursor/windows-7/busy.gif') 16 16,
+            url('cursor/windows-7/busy-frame1.ico'), wait !important;
+}
+body:not(.win7-theme):not(.win11-theme) :is(.window-loading, .window-loading *) {
+    cursor: url('cursor/win-95-xp/Cursor_17.ico'), progress !important;
+}
+body.win7-theme :is(.window-loading, .window-loading *) {
+    cursor: url('cursor/windows-7/working-in-background.gif') 0 8,
+            url('cursor/windows-7/working-in-background-frame1.ico'), progress !important;
+}
